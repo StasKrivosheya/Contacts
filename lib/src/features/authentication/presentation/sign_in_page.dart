@@ -1,3 +1,4 @@
+import 'package:contacts/src/features/authentication/presentation/sign_up_page.dart';
 import 'package:flutter/material.dart';
 
 class SignInPage extends StatefulWidget {
@@ -38,17 +39,13 @@ class _SignInPageState extends State<SignInPage> {
                     TextField(
                       controller: _usernameController,
                       onChanged: (_) => _updateSignInButton(),
-                      decoration: const InputDecoration(
-                          hintText: "Login"
-                      ),
+                      decoration: const InputDecoration(hintText: "Login"),
                     ),
                     TextField(
                       controller: _passwordController,
                       onChanged: (_) => _updateSignInButton(),
                       obscureText: true,
-                      decoration: const InputDecoration(
-                          hintText: "Password"
-                      ),
+                      decoration: const InputDecoration(hintText: "Password"),
                     ),
                   ],
                 ),
@@ -70,17 +67,18 @@ class _SignInPageState extends State<SignInPage> {
                             opacity: _canSignIn ? 1 : 0.3,
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(vertical: 15),
-                                  backgroundColor: const Color.fromRGBO(210, 105, 29, 1),
-                                  disabledBackgroundColor: const Color.fromRGBO(210, 105, 29, 1),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 15),
+                                  backgroundColor:
+                                      const Color.fromRGBO(210, 105, 29, 1),
+                                  disabledBackgroundColor:
+                                      const Color.fromRGBO(210, 105, 29, 1),
                                   elevation: _canSignIn ? 5 : 0,
-                                  side: const BorderSide(
-                                      color: Colors.black
-                                  ),
+                                  side: const BorderSide(color: Colors.black),
                                   shape: const RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.all(Radius.circular(2)),
-                                  )
-                              ),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(2)),
+                                  )),
                               onPressed: _canSignIn ? _signInPressed : null,
                               child: const Text(
                                 "SIGN IN",
@@ -113,9 +111,9 @@ class _SignInPageState extends State<SignInPage> {
     );
   }
 
-  void _updateSignInButton(){
-    bool canSignIn = _usernameController.text.isNotEmpty
-        && _passwordController.text.isNotEmpty;
+  void _updateSignInButton() {
+    bool canSignIn = _usernameController.text.isNotEmpty &&
+        _passwordController.text.isNotEmpty;
     if (_canSignIn != canSignIn) {
       setState(() {
         _canSignIn = canSignIn;
@@ -124,12 +122,12 @@ class _SignInPageState extends State<SignInPage> {
   }
 
   void _signInPressed() {
-    var a = 1;
     // TODO
   }
 
   void _signUpTapped() {
-    var a = 1;
-    // TODO
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return const SignUpPage(title: 'Users SignUp');
+    }));
   }
 }
