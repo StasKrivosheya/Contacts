@@ -17,6 +17,21 @@ class _SignInPageState extends State<SignInPage> {
   bool _canSignIn = false;
 
   @override
+  void initState() {
+    _usernameController.addListener(_updateSignInButton);
+    _passwordController.addListener(_updateSignInButton);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _passwordController.dispose();
+
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -38,12 +53,10 @@ class _SignInPageState extends State<SignInPage> {
                   children: [
                     TextField(
                       controller: _usernameController,
-                      onChanged: (_) => _updateSignInButton(),
                       decoration: const InputDecoration(hintText: "Login"),
                     ),
                     TextField(
                       controller: _passwordController,
-                      onChanged: (_) => _updateSignInButton(),
                       obscureText: true,
                       decoration: const InputDecoration(hintText: "Password"),
                     ),
@@ -61,6 +74,7 @@ class _SignInPageState extends State<SignInPage> {
                   children: [
                     const Spacer(),
                     Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         Expanded(
                           child: Opacity(

@@ -18,6 +18,24 @@ class _SignUpPageState extends State<SignUpPage> {
   bool _canSignUp = false;
 
   @override
+  void initState() {
+    _usernameController.addListener(_updateSignUpButton);
+    _passwordController.addListener(_updateSignUpButton);
+    _confirmPasswordController.addListener(_updateSignUpButton);
+
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -49,18 +67,15 @@ class _SignUpPageState extends State<SignUpPage> {
                   children: [
                     TextField(
                       controller: _usernameController,
-                      onChanged: (_) => _updateSignUpButton(),
                       decoration: const InputDecoration(hintText: "Login"),
                     ),
                     TextField(
                       controller: _passwordController,
-                      onChanged: (_) => _updateSignUpButton(),
                       obscureText: true,
                       decoration: const InputDecoration(hintText: "Password"),
                     ),
                     TextField(
                       controller: _confirmPasswordController,
-                      onChanged: (_) => _updateSignUpButton(),
                       obscureText: true,
                       decoration:
                           const InputDecoration(hintText: "Confirm Password"),
