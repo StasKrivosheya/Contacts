@@ -11,21 +11,21 @@ class SignInPage extends StatefulWidget {
 }
 
 class _SignInPageState extends State<SignInPage> {
-  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _loginController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   bool _canSignIn = false;
 
   @override
   void initState() {
-    _usernameController.addListener(_updateSignInButton);
+    _loginController.addListener(_updateSignInButton);
     _passwordController.addListener(_updateSignInButton);
     super.initState();
   }
 
   @override
   void dispose() {
-    _usernameController.dispose();
+    _loginController.dispose();
     _passwordController.dispose();
 
     super.dispose();
@@ -52,7 +52,7 @@ class _SignInPageState extends State<SignInPage> {
                 child: Column(
                   children: [
                     TextField(
-                      controller: _usernameController,
+                      controller: _loginController,
                       decoration: const InputDecoration(hintText: "Login"),
                     ),
                     TextField(
@@ -126,7 +126,7 @@ class _SignInPageState extends State<SignInPage> {
   }
 
   void _updateSignInButton() {
-    bool canSignIn = _usernameController.text.isNotEmpty &&
+    bool canSignIn = _loginController.text.isNotEmpty &&
         _passwordController.text.isNotEmpty;
     if (_canSignIn != canSignIn) {
       setState(() {
@@ -142,6 +142,14 @@ class _SignInPageState extends State<SignInPage> {
   void _signUpTapped() {
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return const SignUpPage(title: 'Users SignUp');
-    }));
+    }))
+        .then((value) => {
+          if (value != null)
+            {
+              setState(() {
+                _loginController.text = value as String;
+              })
+            }
+        });
   }
 }

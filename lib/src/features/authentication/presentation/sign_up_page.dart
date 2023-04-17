@@ -1,4 +1,8 @@
+import 'package:contacts/src/Validators/StringValidator.dart';
+import 'package:contacts/src/database/database.dart';
+import 'package:contacts/src/models/user_model.dart';
 import 'package:flutter/material.dart';
+import 'package:sqflite/sqflite.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({Key? key, required this.title}) : super(key: key);
@@ -10,7 +14,7 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
-  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _loginController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
@@ -19,7 +23,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
   @override
   void initState() {
-    _usernameController.addListener(_updateSignUpButton);
+    _loginController.addListener(_updateSignUpButton);
     _passwordController.addListener(_updateSignUpButton);
     _confirmPasswordController.addListener(_updateSignUpButton);
 
@@ -28,7 +32,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
   @override
   void dispose() {
-    _usernameController.dispose();
+    _loginController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
 
@@ -66,7 +70,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 child: Column(
                   children: [
                     TextField(
-                      controller: _usernameController,
+                      controller: _loginController,
                       decoration: const InputDecoration(hintText: "Login"),
                     ),
                     TextField(
@@ -120,7 +124,7 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   void _updateSignUpButton() {
-    bool canSignIn = _usernameController.text.isNotEmpty &&
+    bool canSignIn = _loginController.text.isNotEmpty &&
         _passwordController.text.isNotEmpty &&
         _confirmPasswordController.text.isNotEmpty;
     if (_canSignUp != canSignIn) {
@@ -130,7 +134,77 @@ class _SignUpPageState extends State<SignUpPage> {
     }
   }
 
-  void _signUpPressed() {
-    // TODO
+  void _signUpPressed() async {
+    if (_passwordController.text == _confirmPasswordController.text) {
+      List<String> loginErrors =
+          StringValidator.validateLogin(_loginController.text);
+      List<String> passwordErrors =
+          StringValidator.validatePassword(_passwordController.text);
+      List<String> allErrors = loginErrors + passwordErrors;
+
+      if (allErrors.isNotEmpty) {
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Input error!'),
+                content: Text(allErrors.join('\n')),
+                actions: [
+                  TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('Ok')),
+                ],
+              );
+            });
+      } else {
+        User user = User(
+            login: _loginController.text, password: _passwordController.text);
+
+        try {
+          await DBProvider.instance.createUser(user);
+
+          if (context.mounted) {
+            Navigator.of(context).pop(user.login);
+          }
+        } on DatabaseException catch (e) {
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: const Text('Input error!'),
+                  content: Text(
+                      'Username ${_loginController.text} already exists, please consider another one.'),
+                  actions: [
+                    TextButton(
+                        onPressed: () {
+                          if (context.mounted) {
+                            Navigator.of(context).pop();
+                          }
+                        },
+                        child: const Text('Ok')),
+                  ],
+                );
+              });
+        }
+      }
+    } else {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Input error!'),
+              content: const Text('Passwords are different!'),
+              actions: [
+                TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('Ok')),
+              ],
+            );
+          });
+    }
   }
 }
