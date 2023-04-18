@@ -110,7 +110,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                     onPressed: _canSignUp ? _signUpPressed : null,
                     child: const Text(
-                      "SIGN IN",
+                      "SIGN UP",
                       style: TextStyle(color: Colors.black),
                     ),
                   ),

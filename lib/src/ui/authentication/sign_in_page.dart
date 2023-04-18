@@ -1,6 +1,7 @@
 import 'package:contacts/src/helpers/app_settings.dart';
 import 'package:contacts/src/helpers/database.dart';
 import 'package:contacts/src/ui/authentication/sign_up_page.dart';
+import 'package:contacts/src/ui/main_list_page.dart';
 import 'package:flutter/material.dart';
 
 import '../../models/user_model.dart';
@@ -86,16 +87,16 @@ class _SignInPageState extends State<SignInPage> {
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                   padding:
-                                  const EdgeInsets.symmetric(vertical: 15),
+                                      const EdgeInsets.symmetric(vertical: 15),
                                   backgroundColor:
-                                  const Color.fromRGBO(210, 105, 29, 1),
+                                      const Color.fromRGBO(210, 105, 29, 1),
                                   disabledBackgroundColor:
-                                  const Color.fromRGBO(210, 105, 29, 1),
+                                      const Color.fromRGBO(210, 105, 29, 1),
                                   elevation: _canSignIn ? 5 : 0,
                                   side: const BorderSide(color: Colors.black),
                                   shape: const RoundedRectangleBorder(
                                     borderRadius:
-                                    BorderRadius.all(Radius.circular(2)),
+                                        BorderRadius.all(Radius.circular(2)),
                                   )),
                               onPressed: _canSignIn ? _signInPressed : null,
                               child: const Text(
@@ -150,7 +151,7 @@ class _SignInPageState extends State<SignInPage> {
                 title: const Text('Login error!'),
                 content: const Text(
                     'There\'s no user with such login in our database.\n'
-                        'Double check it or consider registering.'),
+                    'Double check it or consider registering.'),
                 actions: [
                   TextButton(
                       onPressed: () {
@@ -164,22 +165,29 @@ class _SignInPageState extends State<SignInPage> {
     } else {
       if (_passwordController.text == user.password) {
         await AppSettings.setLogin(user.login);
-        // TODO: absolute navigation to the main page
+        if (context.mounted) {
+          Navigator.of(context).pushReplacement(MaterialPageRoute(
+              builder: (BuildContext context) =>
+                  const MainListPage(title: "Main List")));
+        }
       } else if (context.mounted) {
-        showDialog(context: context, builder: (context) {
-          return AlertDialog(
-            title: const Text('Password error!'),
-            content: Text('Wrong password for ${_loginController.text}. Try once more!'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text('Ok'),
-              )
-            ],
-          );
-        });
+        showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text('Password error!'),
+                content: Text(
+                    'Wrong password for ${_loginController.text}. Try once more!'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('Ok'),
+                  )
+                ],
+              );
+            });
       }
     }
   }
@@ -187,15 +195,14 @@ class _SignInPageState extends State<SignInPage> {
   void _signUpTapped() {
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return const SignUpPage(title: 'Users SignUp');
-    })).then((value) =>
-    {
-      if (value != null)
-        {
-          setState(() {
-            _loginController.text = value as String;
-            _passwordController.text = '';
-          })
-        }
-    });
+    })).then((value) => {
+          if (value != null)
+            {
+              setState(() {
+                _loginController.text = value as String;
+                _passwordController.text = '';
+              })
+            }
+        });
   }
 }
