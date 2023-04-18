@@ -1,5 +1,5 @@
-import 'package:contacts/src/Validators/StringValidator.dart';
-import 'package:contacts/src/database/database.dart';
+import 'package:contacts/src/validators/string_validator.dart';
+import 'package:contacts/src/helpers/database.dart';
 import 'package:contacts/src/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';

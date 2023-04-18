@@ -42,14 +42,14 @@ class DBProvider {
     return db.insert(_userTableName, user.toJson());
   }
 
-  Future<User?> readUser(int id) async {
+  Future<User?> readUser(String login) async {
     final db = await instance.database;
     User? result;
 
     final maps = await db.query(_userTableName,
         columns: UserFields.allFieldsNames,
-        where: '${UserFields.id} = ?',
-        whereArgs: [id]);
+        where: '${UserFields.login} = ?',
+        whereArgs: [login]);
 
     if (maps.isNotEmpty) {
       result = User.fromJson(maps.first);
