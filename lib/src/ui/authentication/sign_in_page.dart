@@ -1,5 +1,9 @@
-import 'package:contacts/src/features/authentication/presentation/sign_up_page.dart';
+import 'package:contacts/src/helpers/app_settings.dart';
+import 'package:contacts/src/helpers/database.dart';
+import 'package:contacts/src/ui/authentication/sign_up_page.dart';
 import 'package:flutter/material.dart';
+
+import '../../models/user_model.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({Key? key, required this.title}) : super(key: key);
@@ -82,16 +86,16 @@ class _SignInPageState extends State<SignInPage> {
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                   padding:
-                                      const EdgeInsets.symmetric(vertical: 15),
+                                  const EdgeInsets.symmetric(vertical: 15),
                                   backgroundColor:
-                                      const Color.fromRGBO(210, 105, 29, 1),
+                                  const Color.fromRGBO(210, 105, 29, 1),
                                   disabledBackgroundColor:
-                                      const Color.fromRGBO(210, 105, 29, 1),
+                                  const Color.fromRGBO(210, 105, 29, 1),
                                   elevation: _canSignIn ? 5 : 0,
                                   side: const BorderSide(color: Colors.black),
                                   shape: const RoundedRectangleBorder(
                                     borderRadius:
-                                        BorderRadius.all(Radius.circular(2)),
+                                    BorderRadius.all(Radius.circular(2)),
                                   )),
                               onPressed: _canSignIn ? _signInPressed : null,
                               child: const Text(
@@ -126,8 +130,8 @@ class _SignInPageState extends State<SignInPage> {
   }
 
   void _updateSignInButton() {
-    bool canSignIn = _loginController.text.isNotEmpty &&
-        _passwordController.text.isNotEmpty;
+    bool canSignIn =
+        _loginController.text.isNotEmpty && _passwordController.text.isNotEmpty;
     if (_canSignIn != canSignIn) {
       setState(() {
         _canSignIn = canSignIn;
@@ -135,21 +139,63 @@ class _SignInPageState extends State<SignInPage> {
     }
   }
 
-  void _signInPressed() {
-    // TODO
+  void _signInPressed() async {
+    User? user = await DBProvider.instance.readUser(_loginController.text);
+    if (user == null) {
+      if (context.mounted) {
+        showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text('Login error!'),
+                content: const Text(
+                    'There\'s no user with such login in our database.\n'
+                        'Double check it or consider registering.'),
+                actions: [
+                  TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('Ok')),
+                ],
+              );
+            });
+      }
+    } else {
+      if (_passwordController.text == user.password) {
+        await AppSettings.setLogin(user.login);
+        // TODO: absolute navigation to the main page
+      } else if (context.mounted) {
+        showDialog(context: context, builder: (context) {
+          return AlertDialog(
+            title: const Text('Password error!'),
+            content: Text('Wrong password for ${_loginController.text}. Try once more!'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Ok'),
+              )
+            ],
+          );
+        });
+      }
+    }
   }
 
   void _signUpTapped() {
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return const SignUpPage(title: 'Users SignUp');
-    }))
-        .then((value) => {
-          if (value != null)
-            {
-              setState(() {
-                _loginController.text = value as String;
-              })
-            }
-        });
+    })).then((value) =>
+    {
+      if (value != null)
+        {
+          setState(() {
+            _loginController.text = value as String;
+            _passwordController.text = '';
+          })
+        }
+    });
   }
 }
