@@ -1,4 +1,6 @@
-import 'package:contacts/src/features/authentication/presentation/sign_in_page.dart';
+import 'package:contacts/src/ui/authentication/sign_in_page.dart';
+import 'package:contacts/src/helpers/app_settings.dart';
+import 'package:contacts/src/ui/main_list_page.dart';
 import 'package:flutter/material.dart';
 
 void main() async {
@@ -14,14 +16,17 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    String? usersLogin = AppSettings.getLogin();
+
     return MaterialApp(
       title: 'Contacts',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      initialRoute: '/signIn',
+      initialRoute: usersLogin == null ? '/signIn' : '/mainList',
       routes: {
-        '/signIn': (context) => const SignInPage(title: 'Users SignIn')
+        '/signIn': (context) => const SignInPage(title: 'Users SignIn'),
+        '/mainList': (context) => const MainListPage(title: "Main List"),
       },
     );
   }
