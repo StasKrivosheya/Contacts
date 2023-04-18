@@ -1,7 +1,10 @@
 import 'package:contacts/src/features/authentication/presentation/sign_in_page.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await AppSettings.init();
+
   runApp(const MyApp());
 }
 
