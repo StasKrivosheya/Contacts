@@ -166,9 +166,11 @@ class _SignInPageState extends State<SignInPage> {
       if (_passwordController.text == user.password) {
         await AppSettings.setLogin(user.login);
         if (context.mounted) {
-          Navigator.of(context).pushReplacement(MaterialPageRoute(
-              builder: (BuildContext context) =>
-                  const MainListPage(title: "Main List")));
+          Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(
+                  builder: (BuildContext context) =>
+                      const MainListPage(title: "Main List")),
+              (Route<dynamic> route) => false);
         }
       } else if (context.mounted) {
         showDialog(
