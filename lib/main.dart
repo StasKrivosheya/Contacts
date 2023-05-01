@@ -1,6 +1,6 @@
-import 'package:contacts/src/ui/authentication/sign_in_page.dart';
+import 'package:contacts/src/pages/authentication/sign_in_page.dart';
 import 'package:contacts/src/helpers/app_settings.dart';
-import 'package:contacts/src/ui/main_list_page.dart';
+import 'package:contacts/src/pages/main_list_page.dart';
 import 'package:flutter/material.dart';
 
 void main() async {
@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: usersLogin == null ? '/signIn' : '/mainList',
       routes: {
-        '/signIn': (context) => const SignInPage(title: 'Users SignIn'),
+        '/signIn': (context) => const SignInPage(),
         '/mainList': (context) => const MainListPage(title: "Main List"),
       },
     );

@@ -63,7 +63,7 @@ class _MainListPageState extends State<MainListPage> {
       Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(
               builder: (BuildContext context) =>
-                  const SignInPage(title: 'Users SignIn')),
+                  const SignInPage()),
           (Route<dynamic> route) => false);
     }
   }

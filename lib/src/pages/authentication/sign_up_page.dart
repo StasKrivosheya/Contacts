@@ -1,7 +1,8 @@
+import 'package:contacts/src/services/repository/user_repository.dart';
 import 'package:contacts/src/validators/string_validator.dart';
-import 'package:contacts/src/helpers/database.dart';
 import 'package:contacts/src/models/user_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sqflite/sqflite.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -163,12 +164,14 @@ class _SignUpPageState extends State<SignUpPage> {
             login: _loginController.text, password: _passwordController.text);
 
         try {
-          await DBProvider.instance.createUser(user);
+          //await DBProvider.instance.createUser(user);
+          UserRepository ur = context.read<UserRepository>();
+          int result = await ur.insertItemAsync(user);
 
           if (context.mounted) {
             Navigator.of(context).pop(user.login);
           }
-        } on DatabaseException catch (e) {
+        } on DatabaseException {
           showDialog(
               context: context,
               builder: (BuildContext context) {
