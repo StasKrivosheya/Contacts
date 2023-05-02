@@ -1,19 +1,5 @@
 part of 'sign_in_bloc.dart';
 
-enum AuthStatus {
-  normal,
-  loading,
-  success,
-  error,
-}
-
-extension AuthStatusExtention on AuthStatus {
-  bool get isNormal => this == AuthStatus.normal;
-  bool get isLoading => this == AuthStatus.loading;
-  bool get isSuccess => this == AuthStatus.success;
-  bool get isError => this == AuthStatus.error;
-}
-
 class SignInState extends Equatable {
   const SignInState({
     this.username = '',

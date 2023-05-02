@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:contacts/src/models/user_model.dart';
 import 'package:contacts/src/services/repository/user_repository.dart';
+import 'package:contacts/src/widgets/authentication/auth_status.dart';
 import 'package:equatable/equatable.dart';
 
 part 'sign_in_event.dart';
@@ -56,7 +57,7 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
           status: AuthStatus.error,
           errorMessages: [errorMessage],
           attemptsCount: state.attemptsCount + 1));
-      
+
     } else {
       emit(state.copyWith(status: AuthStatus.success));
     }

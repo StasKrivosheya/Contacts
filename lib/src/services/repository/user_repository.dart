@@ -28,7 +28,13 @@ class UserRepository implements IRepository<User> {
         ? queryResult.map((item) => User.fromJson(item)).toList()
         : [];
 
-    return users.firstWhere((user) => predicate(user), orElse: () => null);
+    User? result;
+    try {
+      result = users.firstWhere((user) => predicate(user));
+    } on StateError {
+      result = null;
+    }
+    return result;
   }
 
   @override
