@@ -9,7 +9,7 @@ class AppSettings {
     _sharedPreferences = await SharedPreferences.getInstance();
   }
 
-  static Future<bool> setLogin(String username) async {
+  static Future<bool> setLogin(String username) {
     return _sharedPreferences!.setString(_keyUsername, username);
   }
 
