@@ -1,6 +1,6 @@
-import 'package:contacts/src/helpers/app_settings.dart';
 import 'package:contacts/src/pages/authentication/sign_up_page.dart';
 import 'package:contacts/src/pages/main_list_page.dart';
+import 'package:contacts/src/services/authentication/i_authentication_service.dart';
 import 'package:contacts/src/services/repository/user_repository.dart';
 import 'package:contacts/src/widgets/authentication/auth_status.dart';
 import 'package:contacts/src/widgets/authentication/sign_in/bloc/sign_in_bloc.dart';
@@ -21,13 +21,12 @@ class SignInPage extends StatelessWidget {
           child: Text(title),
         ),
       ),
-      body: RepositoryProvider(
-        create: (context) => UserRepository(),
-        child: BlocProvider<SignInBloc>(
-          create: (context) =>
-              SignInBloc(userRepository: context.read<UserRepository>()),
-          child: const _SignInLayout(),
+      body: BlocProvider<SignInBloc>(
+        create: (context) => SignInBloc(
+          userRepository: context.read<UserRepository>(),
+          authenticationService: context.read<IAuthenticationService>(),
         ),
+        child: const _SignInLayout(),
       ),
     );
   }
@@ -43,14 +42,11 @@ class _SignInLayout extends StatelessWidget {
             current.status.isError || current.status.isSuccess,
         listener: (context, state) async {
           if (state.status.isSuccess) {
-            await AppSettings.setLogin(state.username);
-            if (context.mounted) {
-              Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(
-                      builder: (BuildContext context) =>
-                      const MainListPage(title: "Main List")),
-                      (Route<dynamic> route) => false);
-            }
+            Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                    builder: (BuildContext context) =>
+                        const MainListPage(title: "Main List")),
+                (Route<dynamic> route) => false);
           } else {
             showDialog(
                 context: context,

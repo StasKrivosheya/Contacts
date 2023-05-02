@@ -57,6 +57,7 @@ class _MainListPageState extends State<MainListPage> {
   }
 
   void _performLogout() {
+    // TODO: use auth service and move to bloc
     AppSettings.removeLogin();
 
     if (context.mounted) {

@@ -26,12 +26,9 @@ class SignUpPage extends StatelessWidget {
           ],
         ),
       ),
-      body: RepositoryProvider(
-        create: (context) => UserRepository(),
-        child: BlocProvider(
-          create: (context) => SignUpBloc(context.read<UserRepository>()),
-          child: const _SignUpLayout(),
-        ),
+      body: BlocProvider(
+        create: (context) => SignUpBloc(context.read<UserRepository>()),
+        child: const _SignUpLayout(),
       ),
     );
   }
