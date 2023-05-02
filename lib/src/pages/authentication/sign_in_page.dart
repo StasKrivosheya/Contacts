@@ -1,5 +1,8 @@
+import 'package:contacts/src/helpers/app_settings.dart';
 import 'package:contacts/src/pages/authentication/sign_up_page.dart';
+import 'package:contacts/src/pages/main_list_page.dart';
 import 'package:contacts/src/services/repository/user_repository.dart';
+import 'package:contacts/src/widgets/authentication/auth_status.dart';
 import 'package:contacts/src/widgets/authentication/sign_in/bloc/sign_in_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -20,15 +23,9 @@ class SignInPage extends StatelessWidget {
       ),
       body: RepositoryProvider(
         create: (context) => UserRepository(),
-        child: MultiBlocProvider(
-          providers: [
-            BlocProvider<SignInBloc>(
-                create: (context) =>
-                    SignInBloc(userRepository: context.read<UserRepository>())),
-            // BlocProvider<SignUpBloc>(
-            //     create: (context) =>
-            //         SignUpBloc(userRepository: context.read<UserRepository>())),
-          ],
+        child: BlocProvider<SignInBloc>(
+          create: (context) =>
+              SignInBloc(userRepository: context.read<UserRepository>()),
           child: const _SignInLayout(),
         ),
       ),
@@ -42,23 +39,35 @@ class _SignInLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocListener<SignInBloc, SignInState>(
-        listenWhen: (previous, current) => current.status.isError,
-        listener: (context, state) {
-          showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  title: const Text('Login error!'),
-                  content: Text(state.errorMessages.join('/n')),
-                  actions: [
-                    TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text('Ok')),
-                  ],
-                );
-              });
+        listenWhen: (previous, current) =>
+            current.status.isError || current.status.isSuccess,
+        listener: (context, state) async {
+          if (state.status.isSuccess) {
+            await AppSettings.setLogin(state.username);
+            if (context.mounted) {
+              Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                      builder: (BuildContext context) =>
+                      const MainListPage(title: "Main List")),
+                      (Route<dynamic> route) => false);
+            }
+          } else {
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: const Text('Login error!'),
+                    content: Text(state.errorMessages.join('/n')),
+                    actions: [
+                      TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text('Ok')),
+                    ],
+                  );
+                });
+          }
         },
         child: SafeArea(
           child: Column(
@@ -108,14 +117,21 @@ class _SignInLayout extends StatelessWidget {
 }
 
 class _LoginInput extends StatelessWidget {
+  final TextEditingController _loginController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<SignInBloc, SignInState>(
         buildWhen: (previous, current) => previous.username != current.username,
         builder: (context, state) {
+          _loginController.value = TextEditingValue(
+              text: state.username,
+              selection: TextSelection.fromPosition(
+                  TextPosition(offset: state.username.length)));
           return TextField(
             onChanged: (username) =>
                 context.read<SignInBloc>().add(SignInUsernameChanged(username)),
+            controller: _loginController,
             decoration: const InputDecoration(hintText: "Login"),
           );
         });
@@ -123,14 +139,21 @@ class _LoginInput extends StatelessWidget {
 }
 
 class _PasswordInput extends StatelessWidget {
+  final TextEditingController _passwordController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<SignInBloc, SignInState>(
         buildWhen: (previous, current) => previous.password != current.password,
         builder: (context, state) {
+          _passwordController.value = TextEditingValue(
+              text: state.password,
+              selection: TextSelection.fromPosition(
+                  TextPosition(offset: state.password.length)));
           return TextField(
             onChanged: (password) =>
                 context.read<SignInBloc>().add(SignInPasswordChanged(password)),
+            controller: _passwordController,
             obscureText: true,
             decoration: const InputDecoration(hintText: "Password"),
           );
@@ -193,7 +216,7 @@ class _SignUpHyperLink extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) {
-        return const SignUpPage(title: 'Users SignUp');
+        return const SignUpPage();
       }),
     ).then((value) {
       if (value != null) {
