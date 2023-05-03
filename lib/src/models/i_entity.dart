@@ -1,3 +1,3 @@
 abstract class IEntityBase {
-  int? id;
+  abstract final int? id;
 }
