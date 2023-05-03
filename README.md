@@ -1,2 +1,2 @@
 # Contacts
-Flutter test app
+Contacts app - a project to learn Flutter
