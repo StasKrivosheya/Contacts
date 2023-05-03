@@ -3,6 +3,7 @@ import 'package:contacts/src/helpers/app_settings.dart';
 import 'package:contacts/src/pages/main_list_page.dart';
 import 'package:contacts/src/services/authentication/authentication_service.dart';
 import 'package:contacts/src/services/authentication/i_authentication_service.dart';
+import 'package:contacts/src/services/repository/contact_repository.dart';
 import 'package:contacts/src/services/repository/user_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -27,6 +28,7 @@ class MyApp extends StatelessWidget {
       providers: [
         RepositoryProvider.value(value: _authenticationService),
         RepositoryProvider(create: (context) => UserRepository()),
+        RepositoryProvider(create: (context) => ContactRepository()),
       ],
       child: MaterialApp(
         title: 'Contacts',
@@ -36,7 +38,7 @@ class MyApp extends StatelessWidget {
         initialRoute: isLoggedIn ? '/mainList' : '/signIn',
         routes: {
           '/signIn': (context) => const SignInPage(),
-          '/mainList': (context) => const MainListPage(title: "Main List"),
+          '/mainList': (context) => const MainListPage(),
         },
       ),
     );
