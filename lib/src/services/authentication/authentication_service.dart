@@ -6,18 +6,18 @@ class AuthenticationService implements IAuthenticationService {
   const AuthenticationService();
 
   @override
-  bool get isAuthorized => currentUserName != null;
+  bool get isAuthorized => currentUserId != null;
 
   @override
-  String? get currentUserName => AppSettings.getLogin();
+  int? get currentUserId => AppSettings.getUserId();
 
   @override
-  Future<bool> authenticate(String username) {
-    return AppSettings.setLogin(username);
+  Future<bool> authenticate(int userId) {
+    return AppSettings.setUserId(userId);
   }
 
   @override
   Future<bool> unAuthenticate() {
-    return AppSettings.removeLogin();
+    return AppSettings.removeUserId();
   }
 }

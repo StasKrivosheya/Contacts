@@ -1,9 +1,9 @@
 abstract class IAuthenticationService {
   bool get isAuthorized;
 
-  String? get currentUserName;
+  int? get currentUserId;
 
-  Future<bool> authenticate(String username);
+  Future<bool> authenticate(int userId);
 
   Future<bool> unAuthenticate();
 }
