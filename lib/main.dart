@@ -8,6 +8,8 @@ import 'package:contacts/src/services/repository/user_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'src/widgets/authentication/main_list/bloc/main_list_bloc.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await AppSettings.init();
@@ -30,16 +32,22 @@ class MyApp extends StatelessWidget {
         RepositoryProvider(create: (context) => UserRepository()),
         RepositoryProvider(create: (context) => ContactRepository()),
       ],
-      child: MaterialApp(
-        title: 'Contacts',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
+      child: BlocProvider(
+        create: (context) => MainListBloc(
+          contactRepository: context.read<ContactRepository>(),
+          authenticationService: context.read<IAuthenticationService>(),
         ),
-        initialRoute: isLoggedIn ? '/mainList' : '/signIn',
-        routes: {
-          '/signIn': (context) => const SignInPage(),
-          '/mainList': (context) => const MainListPage(),
-        },
+        child: MaterialApp(
+          title: 'Contacts',
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+          ),
+          initialRoute: isLoggedIn ? '/mainList' : '/signIn',
+          routes: {
+            '/signIn': (context) => const SignInPage(),
+            '/mainList': (context) => const MainListPage(),
+          },
+        ),
       ),
     );
   }

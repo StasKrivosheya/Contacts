@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:contacts/src/models/contact_model.dart';
 import 'package:contacts/src/services/authentication/i_authentication_service.dart';
@@ -16,6 +18,7 @@ class MainListBloc extends Bloc<MainListEvent, MainListState> {
         _authenticationService = authenticationService,
         super(const MainListState()) {
     on<ContactsListRequested>(_onContactsListRequested);
+    on<SignOutRequested>(_onSignOutRequested);
   }
 
   final ContactRepository _contactRepository;
@@ -39,5 +42,9 @@ class MainListBloc extends Bloc<MainListEvent, MainListState> {
             status: PageStatus.success),
       );
     }
+  }
+
+  void _onSignOutRequested(SignOutRequested event, Emitter<MainListState> emit) {
+    _authenticationService.unAuthenticate();
   }
 }
