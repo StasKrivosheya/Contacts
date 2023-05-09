@@ -19,6 +19,7 @@ class MainListBloc extends Bloc<MainListEvent, MainListState> {
         super(const MainListState()) {
     on<ContactsListRequested>(_onContactsListRequested);
     on<SignOutRequested>(_onSignOutRequested);
+    on<DeleteContactRequested>(_onDeleteContactRequested);
   }
 
   final ContactRepository _contactRepository;
@@ -26,7 +27,6 @@ class MainListBloc extends Bloc<MainListEvent, MainListState> {
 
   void _onContactsListRequested(
       ContactsListRequested event, Emitter<MainListState> emit) async {
-
     emit(state.copyWith(status: PageStatus.loading));
 
     int currentUserId = _authenticationService.currentUserId!;
@@ -44,7 +44,22 @@ class MainListBloc extends Bloc<MainListEvent, MainListState> {
     }
   }
 
-  void _onSignOutRequested(SignOutRequested event, Emitter<MainListState> emit) {
-    _authenticationService.unAuthenticate();
+  void _onSignOutRequested(
+      SignOutRequested event, Emitter<MainListState> emit) async {
+    await _authenticationService.unAuthenticate();
+  }
+
+  void _onDeleteContactRequested(
+      DeleteContactRequested event, Emitter<MainListState> emit) async {
+    await _contactRepository.deleteItemAsync(event.contactToDelete);
+
+    List<ContactModel> contacts = state.contacts
+        .where((c) => c != event.contactToDelete)
+        .toList(growable: false);
+
+    PageStatus status =
+        contacts.isEmpty ? PageStatus.empty : PageStatus.success;
+
+    emit(state.copyWith(contacts: contacts, status: status));
   }
 }

@@ -1,7 +1,9 @@
 import 'package:contacts/src/models/contact_model.dart';
+import 'package:contacts/src/services/repository/contact_repository.dart';
 import 'package:contacts/src/widgets/authentication/main_list/bloc/main_list_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 
 import 'authentication/sign_in_page.dart';
@@ -45,27 +47,7 @@ class MainListPage extends StatelessWidget {
       body: SafeArea(
         child: _MainListPageBody(),
       ),
-      floatingActionButton: FloatingActionButton(
-        shape: RoundedRectangleBorder(
-            side: const BorderSide(
-              width: 4,
-              color: Colors.black54,
-            ),
-            borderRadius: BorderRadius.circular(35)),
-        onPressed: () async {
-          // TODO: create add edit page, add route and navigate, remove async
-          // Navigator.push(
-          //   context,
-          //   MaterialPageRoute(builder: (context) {
-          //     return const AddEditPage();
-          //   }),
-          // );
-        },
-        child: const Icon(
-          Icons.add,
-          size: 30,
-        ),
-      ),
+      floatingActionButton: _AddContactFloatingButton(),
     );
   }
 
@@ -88,8 +70,8 @@ class MainListPage extends StatelessWidget {
                     Navigator.of(context).pushAndRemoveUntil(
                         MaterialPageRoute(
                             builder: (BuildContext context) =>
-                                const SignInPage()),
-                        (Route<dynamic> route) => false);
+                            const SignInPage()),
+                            (Route<dynamic> route) => false);
                   },
                   child: const Text('Confirm')),
             ],
@@ -98,14 +80,37 @@ class MainListPage extends StatelessWidget {
   }
 }
 
+class _AddContactFloatingButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return FloatingActionButton(
+      shape: RoundedRectangleBorder(
+          side: const BorderSide(
+            width: 4,
+            color: Colors.black54,
+          ),
+          borderRadius: BorderRadius.circular(35)),
+      onPressed: () async {
+        // TODO: create add edit page, add route and navigate, remove async
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(builder: (context) {
+        //     return const AddEditPage();
+        //   }),
+        // );
+      },
+      child: const Icon(
+        Icons.add,
+        size: 30,
+      ),
+    );
+  }
+}
+
 class _MainListPageBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<MainListBloc, MainListState>(
-      listenWhen: (prev, curr) => true,
-      listener: (context, state) {
-        // todo: e.g. perform navigation to pages
-      },
+    return BlocBuilder<MainListBloc, MainListState>(
       buildWhen: (prev, curr) => prev.status != curr.status,
       builder: (context, state) {
         Widget widgetToShow;
@@ -114,7 +119,7 @@ class _MainListPageBody extends StatelessWidget {
             widgetToShow = const Center(child: CircularProgressIndicator());
             break;
           case PageStatus.success:
-            widgetToShow = _ContactsListView(contacts: state.contacts);
+            widgetToShow = _ContactsListView();
             break;
           default:
             widgetToShow = const Center(
@@ -133,76 +138,138 @@ class _MainListPageBody extends StatelessWidget {
 }
 
 class _ContactsListView extends StatelessWidget {
-  const _ContactsListView({super.key, required this.contacts});
-
-  final List<ContactModel> contacts;
+  const _ContactsListView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      padding: const EdgeInsets.all(5),
-      itemCount: contacts.length,
-      itemBuilder: (context, index) {
-        return Padding(
-          padding: const EdgeInsets.all(10),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            mainAxisSize: MainAxisSize.max,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                flex: 1,
-                child: GestureDetector(
-                  onTap: () {
-                    showDialog(
-                      barrierDismissible: true,
-                      context: context,
-                      builder: (context) {
-                        return Dialog(
-                          child: Image.network(
-                            contacts[index].profileImagePath,
-                          ),
-                        );
-                      },
-                    );
-                  },
-                  child: Image.network(
-                    contacts[index].profileImagePath,
-                    fit: BoxFit.scaleDown,
-                    height: 100,
+    return BlocBuilder<MainListBloc, MainListState>(
+      buildWhen: (previous, current) => previous.contacts != current.contacts,
+      builder: (context, state) {
+        List<ContactModel> contacts = state.contacts;
+
+        return ListView.builder(
+          padding: const EdgeInsets.symmetric(vertical: 5),
+          itemCount: contacts.length,
+          itemBuilder: (context, index) {
+            return Slidable(
+              startActionPane: ActionPane(
+                motion: const DrawerMotion(),
+                children: [
+                  SlidableAction(
+                    onPressed: (context) {
+                      _proceedWithContactDeletion(context, contacts[index]);
+                    },
+                    backgroundColor: const Color(0xFFFE4A49),
+                    foregroundColor: Colors.white,
+                    icon: Icons.delete,
+                    label: 'DELETE',
                   ),
-                ),
+                ],
               ),
-              Expanded(
-                flex: 2,
+              endActionPane: ActionPane(
+                motion: const DrawerMotion(),
+                extentRatio: 0.3,
+                children: [
+                  SlidableAction(
+                    onPressed: (context) {},
+                    backgroundColor: const Color(0xFF21B7CA),
+                    foregroundColor: Colors.white,
+                    icon: Icons.edit_note,
+                    label: 'Edit',
+                  ),
+                ],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(10),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisSize: MainAxisSize.max,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const SizedBox(width: 15),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          contacts[index].nickname,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
+                    Expanded(
+                      flex: 1,
+                      child: GestureDetector(
+                        onTap: () {
+                          showDialog(
+                            barrierDismissible: true,
+                            context: context,
+                            builder: (context) {
+                              return Dialog(
+                                child: Image.network(
+                                  contacts[index].profileImagePath,
+                                ),
+                              );
+                            },
+                          );
+                        },
+                        child: Image.network(
+                          contacts[index].profileImagePath,
+                          fit: BoxFit.scaleDown,
+                          height: 100,
                         ),
-                        const SizedBox(height: 6),
-                        Text(contacts[index].name),
-                        const SizedBox(height: 6),
-                        Text(
-                          DateFormat('MM/dd/yy hh:mm a')
-                              .format(contacts[index].createdDateTime),
-                          style: const TextStyle(fontStyle: FontStyle.italic),
-                        ),
-                      ],
+                      ),
                     ),
+                    Expanded(
+                      flex: 2,
+                      child: Row(
+                        children: [
+                          const SizedBox(width: 15),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                contacts[index].nickname,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(contacts[index].name),
+                              const SizedBox(height: 6),
+                              Text(
+                                DateFormat('MM/dd/yy hh:mm a')
+                                    .format(contacts[index].createdDateTime),
+                                style: const TextStyle(
+                                    fontStyle: FontStyle.italic),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    )
                   ],
                 ),
-              )
-            ],
-          ),
+              ),
+            );
+          },
         );
       },
     );
+  }
+
+  void _proceedWithContactDeletion(BuildContext context, ContactModel contact) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('DELETE CONTACT?'),
+            content: Text(
+                'Are you sure you want to delete ${contact.nickname}?'),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Cancel')),
+              TextButton(
+                  onPressed: () {
+                    context.read<MainListBloc>().add(
+                        DeleteContactRequested(contact));
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Yes')),
+            ],
+          );
+        });
   }
 }
