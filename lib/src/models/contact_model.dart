@@ -8,6 +8,7 @@ class ContactFields {
   static const userId = "userId";
   static const name = "name";
   static const nickname = "nickname";
+  static const description = "description";
   static const profileImagePath = "profileImagePath";
   static const createdDateTime = "createdDateTime";
 
@@ -16,6 +17,7 @@ class ContactFields {
     userId,
     name,
     nickname,
+    description,
     profileImagePath,
     createdDateTime
   ];
@@ -34,6 +36,7 @@ class ContactModel extends Equatable implements IEntityBase {
       required this.userId,
       required this.name,
       required this.nickname,
+      required this.description,
       required this.profileImagePath,
       required this.createdDateTime});
 
@@ -42,6 +45,7 @@ class ContactModel extends Equatable implements IEntityBase {
   final int userId;
   final String name;
   final String nickname;
+  final String description;
   final String profileImagePath;
   final DateTime createdDateTime;
 
@@ -50,6 +54,7 @@ class ContactModel extends Equatable implements IEntityBase {
         userId: json[ContactFields.userId],
         name: json[ContactFields.name],
         nickname: json[ContactFields.nickname],
+        description: json[ContactFields.description],
         profileImagePath: json[ContactFields.profileImagePath],
         createdDateTime: DateTime.parse(json[ContactFields.createdDateTime]),
       );
@@ -59,10 +64,19 @@ class ContactModel extends Equatable implements IEntityBase {
         ContactFields.userId: userId,
         ContactFields.name: name,
         ContactFields.nickname: nickname,
+        ContactFields.description: description,
         ContactFields.profileImagePath: profileImagePath,
         ContactFields.createdDateTime: createdDateTime.toIso8601String(),
       };
 
   @override
-  List<Object?> get props => [id, userId, name, nickname, profileImagePath, createdDateTime];
+  List<Object?> get props => [
+        id,
+        userId,
+        name,
+        nickname,
+        description,
+        profileImagePath,
+        createdDateTime,
+      ];
 }

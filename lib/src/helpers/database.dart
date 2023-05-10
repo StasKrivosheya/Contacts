@@ -42,6 +42,7 @@ class DBProvider {
         '${ContactFields.userId} $intType,'
         '${ContactFields.name} $textType,'
         '${ContactFields.nickname} $textType,'
+        '${ContactFields.description} $textType,'
         '${ContactFields.profileImagePath} $textType,'
         '${ContactFields.createdDateTime} $textType'
         ')');
