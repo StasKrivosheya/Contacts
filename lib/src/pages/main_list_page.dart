@@ -1,5 +1,5 @@
 import 'package:contacts/src/models/contact_model.dart';
-import 'package:contacts/src/services/repository/contact_repository.dart';
+import 'package:contacts/src/pages/add_edit_contact_page.dart';
 import 'package:contacts/src/widgets/authentication/main_list/bloc/main_list_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -90,14 +90,13 @@ class _AddContactFloatingButton extends StatelessWidget {
             color: Colors.black54,
           ),
           borderRadius: BorderRadius.circular(35)),
-      onPressed: () async {
-        // TODO: create add edit page, add route and navigate, remove async
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(builder: (context) {
-        //     return const AddEditPage();
-        //   }),
-        // );
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) {
+            return const AddEditContactPage();
+          }),
+        );
       },
       child: const Icon(
         Icons.add,
@@ -171,7 +170,15 @@ class _ContactsListView extends StatelessWidget {
                 extentRatio: 0.3,
                 children: [
                   SlidableAction(
-                    onPressed: (context) {},
+                    onPressed: (context) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) {
+                          ContactModel swipedContact = contacts[index];
+                          return AddEditContactPage(contactModel: swipedContact);
+                        }),
+                      );
+                    },
                     backgroundColor: const Color(0xFF21B7CA),
                     foregroundColor: Colors.white,
                     icon: Icons.edit_note,
@@ -190,22 +197,42 @@ class _ContactsListView extends StatelessWidget {
                       flex: 1,
                       child: GestureDetector(
                         onTap: () {
-                          showDialog(
-                            barrierDismissible: true,
-                            context: context,
-                            builder: (context) {
-                              return Dialog(
-                                child: Image.network(
-                                  contacts[index].profileImagePath,
-                                ),
-                              );
-                            },
-                          );
+                          if (contacts[index].profileImagePath.isNotEmpty) {
+                            showDialog(
+                              barrierDismissible: true,
+                              context: context,
+                              builder: (context) {
+                                return Dialog(
+                                  // TODO: replace with regular image
+                                  child: Image.network(
+                                    contacts[index].profileImagePath,
+                                  ),
+                                );
+                              },
+                            );
+                          }
                         },
-                        child: Image.network(
-                          contacts[index].profileImagePath,
-                          fit: BoxFit.scaleDown,
-                          height: 100,
+                        child: Builder(
+                          builder: (context) {
+                            Widget imageToShow;
+                            if (contacts[index].profileImagePath.isEmpty) {
+                              imageToShow = const Image(
+                                image: AssetImage(
+                                    'assets/images/avatar_placeholder.png'),
+                                fit: BoxFit.scaleDown,
+                                height: 100,
+                              );
+                            } else {
+                              // TODO: replace with regular image
+                              imageToShow = Image.network(
+                                contacts[index].profileImagePath,
+                                fit: BoxFit.scaleDown,
+                                height: 100,
+                              );
+                            }
+
+                            return imageToShow;
+                          },
                         ),
                       ),
                     ),
