@@ -1,3 +1,4 @@
+import 'package:contacts/src/pages/add_edit_contact_page.dart';
 import 'package:contacts/src/pages/authentication/sign_in_page.dart';
 import 'package:contacts/src/helpers/app_settings.dart';
 import 'package:contacts/src/pages/main_list_page.dart';
@@ -46,6 +47,7 @@ class MyApp extends StatelessWidget {
           routes: {
             '/signIn': (context) => const SignInPage(),
             '/mainList': (context) => const MainListPage(),
+            '/addEditContact': (context) => const AddEditContactPage(),
           },
         ),
       ),
