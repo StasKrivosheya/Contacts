@@ -69,6 +69,25 @@ class ContactModel extends Equatable implements IEntityBase {
         ContactFields.createdDateTime: createdDateTime.toIso8601String(),
       };
 
+  ContactModel copyWith({
+    int? id,
+    int? userId,
+    String? name,
+    String? nickname,
+    String? description,
+    String? profileImagePath,
+    DateTime? createdDateTime,
+  }) {
+    return ContactModel(
+        id: id ?? this.id,
+        userId: userId ?? this.userId,
+        name: name ?? this.name,
+        nickname: nickname ?? this.nickname,
+        description: description ?? this.description,
+        profileImagePath: profileImagePath ?? this.profileImagePath,
+        createdDateTime: createdDateTime ?? this.createdDateTime);
+  }
+
   @override
   List<Object?> get props => [
         id,

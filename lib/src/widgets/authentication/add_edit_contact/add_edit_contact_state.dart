@@ -25,12 +25,12 @@ class AddEditContactState extends Equatable {
 
   AddEditContactState copyWith(
       {AddEditPageStatus? pageStatus,
-      int? userId,
       String? profileImagePath,
       String? nickname,
       String? name,
       String? description}) {
     return AddEditContactState(
+      initialContactModel: initialContactModel,
       pageStatus: pageStatus ?? this.pageStatus,
       profileImagePath: profileImagePath ?? this.profileImagePath,
       nickname: nickname ?? this.nickname,
