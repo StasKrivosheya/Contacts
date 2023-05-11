@@ -15,7 +15,7 @@ class MainListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    context.read<MainListBloc>().add(ContactsListRequested());
+    context.read<MainListBloc>().add(ContactsListSubscriptionRequested());
 
     return Scaffold(
       appBar: AppBar(

@@ -18,12 +18,26 @@ class MainListBloc extends Bloc<MainListEvent, MainListState> {
         _authenticationService = authenticationService,
         super(const MainListState()) {
     on<ContactsListRequested>(_onContactsListRequested);
+    on<ContactsListSubscriptionRequested>(_onContactsListSubscriptionRequested);
     on<SignOutRequested>(_onSignOutRequested);
     on<DeleteContactRequested>(_onDeleteContactRequested);
   }
 
   final ContactRepository _contactRepository;
   final IAuthenticationService _authenticationService;
+
+  void _onContactsListSubscriptionRequested(
+      ContactsListSubscriptionRequested event,
+      Emitter<MainListState> emit) async {
+    emit(state.copyWith(status: PageStatus.loading));
+
+    await emit.forEach(
+        _contactRepository.getContacts(_authenticationService.currentUserId!),
+        onData: (contacts) => state.copyWith(
+          status: PageStatus.success,
+          contacts: contacts,
+        ));
+  }
 
   void _onContactsListRequested(
       ContactsListRequested event, Emitter<MainListState> emit) async {

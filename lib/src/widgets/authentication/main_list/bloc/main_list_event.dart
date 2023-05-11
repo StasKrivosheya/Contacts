@@ -9,6 +9,11 @@ class ContactsListRequested extends MainListEvent {
   List<Object?> get props => [];
 }
 
+class ContactsListSubscriptionRequested extends MainListEvent {
+  @override
+  List<Object?> get props => [];
+}
+
 class SignOutRequested extends MainListEvent {
   @override
   List<Object?> get props => [];
