@@ -33,10 +33,21 @@ class MainListBloc extends Bloc<MainListEvent, MainListState> {
 
     await emit.forEach(
         _contactRepository.getContacts(_authenticationService.currentUserId!),
-        onData: (contacts) => state.copyWith(
+        onData: (contacts) {
+      MainListState stateToReturn;
+      if (contacts.isEmpty) {
+        stateToReturn = state.copyWith(
+          status: PageStatus.empty,
+        );
+      } else {
+        stateToReturn = state.copyWith(
           status: PageStatus.success,
           contacts: contacts,
-        ));
+        );
+      }
+
+      return stateToReturn;
+    });
   }
 
   void _onContactsListRequested(
