@@ -1,9 +1,14 @@
+import 'dart:io';
+
+import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
 import 'package:contacts/src/models/contact_model.dart';
 import 'package:contacts/src/services/authentication/i_authentication_service.dart';
+import 'package:contacts/src/services/media_picker/media_picker.dart';
 import 'package:contacts/src/services/repository/contact_repository.dart';
 import 'package:contacts/src/widgets/authentication/add_edit_contact/add_edit_contact_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 
 class AddEditContactPage extends StatelessWidget {
   const AddEditContactPage({super.key, this.contactModel});
@@ -17,6 +22,7 @@ class AddEditContactPage extends StatelessWidget {
           AddEditContactBloc(
             contactRepository: context.read<ContactRepository>(),
             authenticationService: context.read<IAuthenticationService>(),
+            mediaPicker: context.read<MediaPicker>(),
             contactModel: contactModel,
           ),
       child: _PageScaffold(),
@@ -80,13 +86,32 @@ class _PageBody extends StatelessWidget {
         children: [
           Expanded(
             flex: 2,
-            child: BlocBuilder<AddEditContactBloc, AddEditContactState>(
-              builder: (context, state) {
-                // TODO: return either placeholder or existent photo
-                return const Image(
-                  image: AssetImage('assets/images/avatar_placeholder.png'),
-                );
+            child: GestureDetector(
+              onTap: () {
+                showAdaptiveActionSheet(context: context, actions: [
+                  BottomSheetAction(title: const Text('Gallery'), onPressed: (context) {
+                    context.read<AddEditContactBloc>().add(const PickFromGalleryRequested());
+                  }),
+                  BottomSheetAction(title: const Text('Camera'), onPressed: (context) {
+                    context.read<AddEditContactBloc>().add(const TakeWithCameraRequested());
+                  }),
+                ]);
               },
+              child: BlocBuilder<AddEditContactBloc, AddEditContactState>(
+                buildWhen: (prev, curr) =>
+                    prev.profileImagePath != curr.profileImagePath,
+                builder: (context, state) {
+                  Widget image;
+                  if (state.profileImagePath.isEmpty) {
+                    image = const Image(
+                      image: AssetImage('assets/images/avatar_placeholder.png'),
+                    );
+                  } else {
+                    image = Image.file(File(state.profileImagePath));
+                  }
+                  return image;
+                },
+              ),
             ),
           ),
           Expanded(

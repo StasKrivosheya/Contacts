@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:contacts/src/models/contact_model.dart';
 import 'package:contacts/src/pages/add_edit_contact_page.dart';
 import 'package:contacts/src/widgets/authentication/main_list/bloc/main_list_bloc.dart';
@@ -118,7 +120,7 @@ class _MainListPageBody extends StatelessWidget {
             widgetToShow = const Center(child: CircularProgressIndicator());
             break;
           case PageStatus.success:
-            widgetToShow = _ContactsListView();
+            widgetToShow = const _ContactsListView();
             break;
           default:
             widgetToShow = const Center(
@@ -203,17 +205,21 @@ class _ContactsListView extends StatelessWidget {
                               context: context,
                               builder: (context) {
                                 return Dialog(
-                                  // TODO: replace with regular image
-                                  child: Image.network(
-                                    contacts[index].profileImagePath,
+                                  child: Image.file(
+                                    File(contacts[index].profileImagePath),
+                                    fit: BoxFit.scaleDown,
+                                    height: 100,
                                   ),
                                 );
                               },
                             );
                           }
                         },
-                        child: Builder(
-                          builder: (context) {
+                        child: BlocBuilder<MainListBloc, MainListState>(
+                          buildWhen: (previous, current) =>
+                              previous.contacts[index].profileImagePath !=
+                              contacts[index].profileImagePath,
+                          builder: (context, state) {
                             Widget imageToShow;
                             if (contacts[index].profileImagePath.isEmpty) {
                               imageToShow = const Image(
@@ -223,9 +229,8 @@ class _ContactsListView extends StatelessWidget {
                                 height: 100,
                               );
                             } else {
-                              // TODO: replace with regular image
-                              imageToShow = Image.network(
-                                contacts[index].profileImagePath,
+                              imageToShow = Image.file(
+                                File(contacts[index].profileImagePath),
                                 fit: BoxFit.scaleDown,
                                 height: 100,
                               );
