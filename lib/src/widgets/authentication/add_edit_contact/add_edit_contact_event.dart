@@ -36,11 +36,16 @@ class ContactDescriptionChanged extends AddEditContactEvent {
   List<Object?> get props => [description];
 }
 
-class ContactAvatarChanged extends AddEditContactEvent {
-  const ContactAvatarChanged(this.avatarSource);
-
-  final String avatarSource;
+class PickFromGalleryRequested extends AddEditContactEvent {
+  const PickFromGalleryRequested();
 
   @override
-  List<Object?> get props => [avatarSource];
+  List<Object?> get props => [];
+}
+
+class TakeWithCameraRequested extends AddEditContactEvent {
+  const TakeWithCameraRequested();
+
+  @override
+  List<Object?> get props => [];
 }
