@@ -45,6 +45,8 @@ dependencies:
   intl: ^0.18.1
   flutter_slidable: ^3.0.0
   rxdart: ^0.27.7
+  image_picker: ^0.8.7+4
+  adaptive_action_sheet: ^2.0.2
 
 dev_dependencies:
   flutter_test:

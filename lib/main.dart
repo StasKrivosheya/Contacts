@@ -4,11 +4,13 @@ import 'package:contacts/src/helpers/app_settings.dart';
 import 'package:contacts/src/pages/main_list_page.dart';
 import 'package:contacts/src/services/authentication/authentication_service.dart';
 import 'package:contacts/src/services/authentication/i_authentication_service.dart';
+import 'package:contacts/src/services/media_picker/i_media_picker.dart';
 import 'package:contacts/src/services/repository/contact_repository.dart';
 import 'package:contacts/src/services/repository/user_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'src/services/media_picker/media_picker.dart';
 import 'src/widgets/authentication/main_list/bloc/main_list_bloc.dart';
 
 void main() async {
@@ -32,6 +34,7 @@ class MyApp extends StatelessWidget {
         RepositoryProvider.value(value: _authenticationService),
         RepositoryProvider(create: (context) => UserRepository()),
         RepositoryProvider(create: (context) => ContactRepository()),
+        RepositoryProvider(create: (context) => MediaPicker()),
       ],
       child: BlocProvider(
         create: (context) => MainListBloc(
