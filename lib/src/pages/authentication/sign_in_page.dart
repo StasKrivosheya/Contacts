@@ -45,7 +45,7 @@ class _SignInLayout extends StatelessWidget {
             Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(
                     builder: (BuildContext context) =>
-                        const MainListPage(title: "Main List")),
+                        const MainListPage()),
                 (Route<dynamic> route) => false);
           } else {
             showDialog(

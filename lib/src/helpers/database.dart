@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:contacts/src/models/contact_model.dart';
 import 'package:contacts/src/models/user_model.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -28,11 +29,22 @@ class DBProvider {
   Future _createDB(Database db, int version) async {
     const idType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
     const textType = 'TEXT NOT NULL';
+    const intType = 'INTEGER NOT NULL';
 
     await db.execute('CREATE TABLE ${UserFields.databaseTableName} ('
         '${UserFields.id} $idType,'
         '${UserFields.login} $textType UNIQUE,'
         '${UserFields.password} $textType'
+        ')');
+
+    await db.execute('CREATE TABLE ${ContactFields.databaseTableName} ('
+        '${ContactFields.id} $idType,'
+        '${ContactFields.userId} $intType,'
+        '${ContactFields.name} $textType,'
+        '${ContactFields.nickname} $textType,'
+        '${ContactFields.description} $textType,'
+        '${ContactFields.profileImagePath} $textType,'
+        '${ContactFields.createdDateTime} $textType'
         ')');
 
     // TODO: create other tables
