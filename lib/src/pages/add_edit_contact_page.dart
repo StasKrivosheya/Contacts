@@ -8,7 +8,6 @@ import 'package:contacts/src/services/repository/contact_repository.dart';
 import 'package:contacts/src/widgets/authentication/add_edit_contact/add_edit_contact_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:image_picker/image_picker.dart';
 
 class AddEditContactPage extends StatelessWidget {
   const AddEditContactPage({super.key, this.contactModel});
@@ -88,12 +87,15 @@ class _PageBody extends StatelessWidget {
             flex: 2,
             child: GestureDetector(
               onTap: () {
-                showAdaptiveActionSheet(context: context, actions: [
+                final blocContext = context;
+                showAdaptiveActionSheet(context: context, actions: <BottomSheetAction>[
                   BottomSheetAction(title: const Text('Gallery'), onPressed: (context) {
-                    context.read<AddEditContactBloc>().add(const PickFromGalleryRequested());
+                    blocContext.read<AddEditContactBloc>().add(const PickFromGalleryRequested());
+                    Navigator.pop(context);
                   }),
                   BottomSheetAction(title: const Text('Camera'), onPressed: (context) {
-                    context.read<AddEditContactBloc>().add(const TakeWithCameraRequested());
+                    blocContext.read<AddEditContactBloc>().add(const TakeWithCameraRequested());
+                    Navigator.pop(context);
                   }),
                 ]);
               },

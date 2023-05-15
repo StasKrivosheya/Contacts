@@ -17,7 +17,7 @@ class ContactRepository implements IRepository<ContactModel> {
   @override
   late final String tableName;
 
-  final _contactStreamController = BehaviorSubject<List<ContactModel>>.seeded(const []);
+  final _contactStreamController = BehaviorSubject<List<ContactModel>>();
 
   @override
   Future<int> deleteItemAsync(ContactModel contact) async {
