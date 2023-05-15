@@ -88,16 +88,40 @@ class _PageBody extends StatelessWidget {
             child: GestureDetector(
               onTap: () {
                 final blocContext = context;
-                showAdaptiveActionSheet(context: context, actions: <BottomSheetAction>[
-                  BottomSheetAction(title: const Text('Gallery'), onPressed: (context) {
-                    blocContext.read<AddEditContactBloc>().add(const PickFromGalleryRequested());
-                    Navigator.pop(context);
-                  }),
-                  BottomSheetAction(title: const Text('Camera'), onPressed: (context) {
-                    blocContext.read<AddEditContactBloc>().add(const TakeWithCameraRequested());
-                    Navigator.pop(context);
-                  }),
-                ]);
+                showAdaptiveActionSheet(
+                    context: context,
+                    actions: <BottomSheetAction>[
+                      BottomSheetAction(
+                          title: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: const [
+                              Icon(Icons.photo_library_outlined),
+                              SizedBox(width: 10),
+                              Text('Gallery'),
+                            ],
+                          ),
+                          onPressed: (context) {
+                            blocContext
+                                .read<AddEditContactBloc>()
+                                .add(const PickFromGalleryRequested());
+                            Navigator.pop(context);
+                          }),
+                      BottomSheetAction(
+                          title: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: const [
+                              Icon(Icons.camera_alt_outlined),
+                              SizedBox(width: 10),
+                              Text('Camera'),
+                            ],
+                          ),
+                          onPressed: (context) {
+                            blocContext
+                                .read<AddEditContactBloc>()
+                                .add(const TakeWithCameraRequested());
+                            Navigator.pop(context);
+                          }),
+                    ]);
               },
               child: BlocBuilder<AddEditContactBloc, AddEditContactState>(
                 buildWhen: (prev, curr) =>
@@ -212,6 +236,7 @@ class _DescriptionInput extends StatelessWidget {
           ),
           minLines: 5,
           maxLines: 5,
+          maxLength: 120,
         );
       },
     );
