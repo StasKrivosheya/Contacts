@@ -100,6 +100,8 @@ class ContactRepository implements IRepository<ContactModel> {
 
     if (contactsList != null && contactsList.isNotEmpty) {
       _contactStreamController.add(contactsList.toList());
+    } else {
+      _contactStreamController.add([]);
     }
   }
 }

@@ -208,7 +208,6 @@ class _ContactsListView extends StatelessWidget {
                                   child: Image.file(
                                     File(contacts[index].profileImagePath),
                                     fit: BoxFit.scaleDown,
-                                    height: 100,
                                   ),
                                 );
                               },
