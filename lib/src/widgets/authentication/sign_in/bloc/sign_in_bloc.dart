@@ -64,7 +64,7 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
           attemptsCount: state.attemptsCount + 1));
 
     } else {
-      bool wasSuccessful = await _authenticationService.authenticate(state.username);
+      bool wasSuccessful = await _authenticationService.authenticate(user.id!);
 
       if (wasSuccessful) {
         emit(state.copyWith(status: AuthStatus.success));
