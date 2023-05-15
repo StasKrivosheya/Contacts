@@ -152,68 +152,68 @@ class _ContactsListView extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 5),
           itemCount: contacts.length,
           itemBuilder: (context, index) {
-            return Slidable(
-              startActionPane: ActionPane(
-                motion: const DrawerMotion(),
-                children: [
-                  SlidableAction(
-                    onPressed: (context) {
-                      _proceedWithContactDeletion(context, contacts[index]);
-                    },
-                    backgroundColor: const Color(0xFFFE4A49),
-                    foregroundColor: Colors.white,
-                    icon: Icons.delete,
-                    label: 'DELETE',
-                  ),
-                ],
-              ),
-              endActionPane: ActionPane(
-                motion: const DrawerMotion(),
-                extentRatio: 0.3,
-                children: [
-                  SlidableAction(
-                    onPressed: (context) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) {
-                          ContactModel swipedContact = contacts[index];
-                          return AddEditContactPage(contactModel: swipedContact);
-                        }),
+            return GestureDetector(
+              onTap: () {
+                if (contacts[index].profileImagePath.isNotEmpty) {
+                  showDialog(
+                    barrierDismissible: true,
+                    context: context,
+                    builder: (context) {
+                      return Dialog(
+                        child: Image.file(
+                          File(contacts[index].profileImagePath),
+                          fit: BoxFit.scaleDown,
+                        ),
                       );
                     },
-                    backgroundColor: const Color(0xFF21B7CA),
-                    foregroundColor: Colors.white,
-                    icon: Icons.edit_note,
-                    label: 'Edit',
-                  ),
-                ],
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  );
+                }
+              },
+              child: Slidable(
+                startActionPane: ActionPane(
+                  motion: const DrawerMotion(),
                   children: [
-                    Expanded(
-                      flex: 1,
-                      child: GestureDetector(
-                        onTap: () {
-                          if (contacts[index].profileImagePath.isNotEmpty) {
-                            showDialog(
-                              barrierDismissible: true,
-                              context: context,
-                              builder: (context) {
-                                return Dialog(
-                                  child: Image.file(
-                                    File(contacts[index].profileImagePath),
-                                    fit: BoxFit.scaleDown,
-                                  ),
-                                );
-                              },
-                            );
-                          }
-                        },
+                    SlidableAction(
+                      onPressed: (context) {
+                        _proceedWithContactDeletion(context, contacts[index]);
+                      },
+                      backgroundColor: const Color(0xFFFE4A49),
+                      foregroundColor: Colors.white,
+                      icon: Icons.delete,
+                      label: 'DELETE',
+                    ),
+                  ],
+                ),
+                endActionPane: ActionPane(
+                  motion: const DrawerMotion(),
+                  extentRatio: 0.3,
+                  children: [
+                    SlidableAction(
+                      onPressed: (context) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) {
+                            ContactModel swipedContact = contacts[index];
+                            return AddEditContactPage(contactModel: swipedContact);
+                          }),
+                        );
+                      },
+                      backgroundColor: const Color(0xFF21B7CA),
+                      foregroundColor: Colors.white,
+                      icon: Icons.edit_note,
+                      label: 'Edit',
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    mainAxisSize: MainAxisSize.max,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        flex: 1,
                         child: BlocBuilder<MainListBloc, MainListState>(
                           buildWhen: (previous, current) =>
                               previous.contacts[index].profileImagePath !=
@@ -239,36 +239,36 @@ class _ContactsListView extends StatelessWidget {
                           },
                         ),
                       ),
-                    ),
-                    Expanded(
-                      flex: 2,
-                      child: Row(
-                        children: [
-                          const SizedBox(width: 15),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                contacts[index].nickname,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(height: 6),
-                              Text(contacts[index].name),
-                              const SizedBox(height: 6),
-                              Text(
-                                DateFormat('MM/dd/yy hh:mm a')
-                                    .format(contacts[index].createdDateTime),
-                                style: const TextStyle(
-                                    fontStyle: FontStyle.italic),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
+                      Expanded(
+                        flex: 2,
+                        child: Row(
+                          children: [
+                            const SizedBox(width: 15),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  contacts[index].nickname,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(height: 6),
+                                Text(contacts[index].name),
+                                const SizedBox(height: 6),
+                                Text(
+                                  DateFormat('MM/dd/yy hh:mm a')
+                                      .format(contacts[index].createdDateTime),
+                                  style: const TextStyle(
+                                      fontStyle: FontStyle.italic),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
                 ),
               ),
             );
