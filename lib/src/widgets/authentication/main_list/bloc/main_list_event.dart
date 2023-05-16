@@ -14,6 +14,11 @@ class ContactsListSubscriptionRequested extends MainListEvent {
   List<Object?> get props => [];
 }
 
+class ContactsSortFieldSubscriptionRequested extends MainListEvent {
+  @override
+  List<Object?> get props => [];
+}
+
 class SignOutRequested extends MainListEvent {
   @override
   List<Object?> get props => [];

@@ -1,9 +1,9 @@
-import 'dart:async';
-
 import 'package:bloc/bloc.dart';
 import 'package:contacts/src/models/contact_model.dart';
+import 'package:contacts/src/services/AppSettings/i_app_settings.dart';
 import 'package:contacts/src/services/authentication/i_authentication_service.dart';
 import 'package:contacts/src/services/repository/contact_repository.dart';
+import 'package:contacts/src/widgets/settings_page/bloc/settings_page_bloc.dart';
 import 'package:equatable/equatable.dart';
 
 part 'main_list_event.dart';
@@ -14,63 +14,57 @@ class MainListBloc extends Bloc<MainListEvent, MainListState> {
   MainListBloc({
     required ContactRepository contactRepository,
     required IAuthenticationService authenticationService,
+    required IAppSettings appSettings,
   })  : _contactRepository = contactRepository,
         _authenticationService = authenticationService,
+        _appSettings = appSettings,
         super(const MainListState()) {
-    on<ContactsListRequested>(_onContactsListRequested);
     on<ContactsListSubscriptionRequested>(_onContactsListSubscriptionRequested);
+    on<ContactsSortFieldSubscriptionRequested>(_onContactsSortFieldSubscriptionRequested);
     on<SignOutRequested>(_onSignOutRequested);
     on<DeleteContactRequested>(_onDeleteContactRequested);
   }
 
   final ContactRepository _contactRepository;
   final IAuthenticationService _authenticationService;
+  final IAppSettings _appSettings;
 
   void _onContactsListSubscriptionRequested(
-      ContactsListSubscriptionRequested event,
-      Emitter<MainListState> emit) async {
+      ContactsListSubscriptionRequested event, Emitter<MainListState> emit) async {
     emit(state.copyWith(status: PageStatus.loading));
 
     await emit.forEach(
         _contactRepository.getContacts(_authenticationService.currentUserId!),
         onData: (contacts) {
-      MainListState stateToReturn;
+      MainListState updatedState;
+
       if (contacts.isEmpty) {
-        stateToReturn = state.copyWith(
-          status: PageStatus.empty,
-        );
+        updatedState = state.copyWith(status: PageStatus.empty);
       } else {
-        stateToReturn = state.copyWith(
-          status: PageStatus.success,
-          contacts: contacts,
-        );
+        _sortContacts(contacts, _appSettings.getSortField());
+        updatedState = state.copyWith(status: PageStatus.success, contacts: contacts);
       }
 
-      return stateToReturn;
+      return updatedState;
     });
   }
 
-  void _onContactsListRequested(
-      ContactsListRequested event, Emitter<MainListState> emit) async {
-    emit(state.copyWith(status: PageStatus.loading));
+  void _onContactsSortFieldSubscriptionRequested(
+      ContactsSortFieldSubscriptionRequested event, Emitter<MainListState> emit) async {
 
-    int currentUserId = _authenticationService.currentUserId!;
-    Iterable<ContactModel>? userContacts = await _contactRepository
-        .getItemsAsync(predicate: (contact) => contact.userId == currentUserId);
+    await emit.forEach(
+      _appSettings.getSortFieldStream(),
+      onData: (sortBy) {
+        List<ContactModel> contacts = List.from(state.contacts);
+        _sortContacts(contacts, sortBy);
 
-    if (userContacts == null || userContacts.isEmpty) {
-      emit(state.copyWith(status: PageStatus.empty));
-    } else {
-      emit(
-        state.copyWith(
-            contacts: userContacts.toList(growable: false),
-            status: PageStatus.success),
-      );
-    }
+        return state.copyWith(contacts: contacts);
+      },
+    );
+
   }
 
-  void _onSignOutRequested(
-      SignOutRequested event, Emitter<MainListState> emit) async {
+  void _onSignOutRequested(SignOutRequested event, Emitter<MainListState> emit) async {
     await _authenticationService.unAuthenticate();
   }
 
@@ -82,9 +76,22 @@ class MainListBloc extends Bloc<MainListEvent, MainListState> {
         .where((c) => c != event.contactToDelete)
         .toList(growable: false);
 
-    PageStatus status =
-        contacts.isEmpty ? PageStatus.empty : PageStatus.success;
+    PageStatus status = contacts.isEmpty ? PageStatus.empty : PageStatus.success;
 
     emit(state.copyWith(contacts: contacts, status: status));
+  }
+
+  void _sortContacts(List<ContactModel> contacts, ESortBy sortBy) {
+    switch (sortBy) {
+      case ESortBy.name:
+        contacts.sort((a, b) => a.name.compareTo(b.name));
+        break;
+      case ESortBy.nickname:
+        contacts.sort((a, b) => a.nickname.compareTo(b.nickname));
+        break;
+      default:
+        contacts.sort((a, b) => a.createdDateTime.compareTo(b.createdDateTime));
+        break;
+    }
   }
 }

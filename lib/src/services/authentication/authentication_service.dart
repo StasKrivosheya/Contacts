@@ -1,23 +1,26 @@
-import 'package:contacts/src/helpers/app_settings.dart';
+import 'package:contacts/src/services/AppSettings/i_app_settings.dart';
 
 import 'i_authentication_service.dart';
 
 class AuthenticationService implements IAuthenticationService {
-  const AuthenticationService();
+  const AuthenticationService({required IAppSettings appSettings})
+      : _appSettings = appSettings;
+
+  final IAppSettings _appSettings;
 
   @override
   bool get isAuthorized => currentUserId != null;
 
   @override
-  int? get currentUserId => AppSettings.getUserId();
+  int? get currentUserId => _appSettings.getCurrentUserId();
 
   @override
   Future<bool> authenticate(int userId) {
-    return AppSettings.setUserId(userId);
+    return _appSettings.setCurrentUserId(userId);
   }
 
   @override
   Future<bool> unAuthenticate() {
-    return AppSettings.removeUserId();
+    return _appSettings.removeCurrentUserId();
   }
 }

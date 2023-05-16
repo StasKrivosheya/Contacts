@@ -1,10 +1,10 @@
 import 'package:contacts/src/pages/add_edit_contact_page.dart';
 import 'package:contacts/src/pages/authentication/sign_in_page.dart';
-import 'package:contacts/src/helpers/app_settings.dart';
 import 'package:contacts/src/pages/main_list_page.dart';
+import 'package:contacts/src/services/AppSettings/app_settings.dart';
+import 'package:contacts/src/services/AppSettings/i_app_settings.dart';
 import 'package:contacts/src/services/authentication/authentication_service.dart';
 import 'package:contacts/src/services/authentication/i_authentication_service.dart';
-import 'package:contacts/src/services/media_picker/i_media_picker.dart';
 import 'package:contacts/src/services/repository/contact_repository.dart';
 import 'package:contacts/src/services/repository/user_repository.dart';
 import 'package:flutter/material.dart';
@@ -15,15 +15,19 @@ import 'src/widgets/authentication/main_list/bloc/main_list_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await AppSettings.init();
+  IAppSettings appSettings = AppSettings();
+  await appSettings.init();
 
-  runApp(const MyApp());
+  runApp(MyApp(appSettings: appSettings));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key, required IAppSettings appSettings})
+      : _appSettings = appSettings,
+        _authenticationService = AuthenticationService(appSettings: appSettings);
 
-  final IAuthenticationService _authenticationService = const AuthenticationService();
+  final IAppSettings _appSettings;
+  final IAuthenticationService _authenticationService;
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +35,7 @@ class MyApp extends StatelessWidget {
 
     return MultiRepositoryProvider(
       providers: [
+        RepositoryProvider.value(value: _appSettings),
         RepositoryProvider.value(value: _authenticationService),
         RepositoryProvider(create: (context) => UserRepository()),
         RepositoryProvider(create: (context) => ContactRepository()),
@@ -40,6 +45,7 @@ class MyApp extends StatelessWidget {
         create: (context) => MainListBloc(
           contactRepository: context.read<ContactRepository>(),
           authenticationService: context.read<IAuthenticationService>(),
+          appSettings: context.read<IAppSettings>(),
         ),
         child: MaterialApp(
           title: 'Contacts',
