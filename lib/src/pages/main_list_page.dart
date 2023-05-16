@@ -9,6 +9,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 
 import 'authentication/sign_in_page.dart';
+import 'settings_page.dart';
 
 class MainListPage extends StatelessWidget {
   const MainListPage({super.key});
@@ -18,6 +19,7 @@ class MainListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     context.read<MainListBloc>().add(ContactsListSubscriptionRequested());
+    context.read<MainListBloc>().add(ContactsSortFieldSubscriptionRequested());
 
     return Scaffold(
       appBar: AppBar(
@@ -34,13 +36,12 @@ class MainListPage extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.settings),
               onPressed: () {
-                // TODO: create settings page, add route and navigate
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(builder: (context) {
-                //     return const SettingsPage();
-                //   }),
-                // );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) {
+                    return const SettingsPage();
+                  }),
+                );
               },
             ),
           ],

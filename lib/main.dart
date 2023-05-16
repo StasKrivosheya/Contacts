@@ -1,6 +1,7 @@
 import 'package:contacts/src/pages/add_edit_contact_page.dart';
 import 'package:contacts/src/pages/authentication/sign_in_page.dart';
 import 'package:contacts/src/pages/main_list_page.dart';
+import 'package:contacts/src/pages/settings_page.dart';
 import 'package:contacts/src/services/AppSettings/app_settings.dart';
 import 'package:contacts/src/services/AppSettings/i_app_settings.dart';
 import 'package:contacts/src/services/authentication/authentication_service.dart';
@@ -57,6 +58,7 @@ class MyApp extends StatelessWidget {
             '/signIn': (context) => const SignInPage(),
             '/mainList': (context) => const MainListPage(),
             '/addEditContact': (context) => const AddEditContactPage(),
+            '/settings': (context) => const SettingsPage(),
           },
         ),
       ),
