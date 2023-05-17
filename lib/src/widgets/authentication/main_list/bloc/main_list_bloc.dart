@@ -84,10 +84,10 @@ class MainListBloc extends Bloc<MainListEvent, MainListState> {
   void _sortContacts(List<ContactModel> contacts, ESortBy sortBy) {
     switch (sortBy) {
       case ESortBy.name:
-        contacts.sort((a, b) => a.name.compareTo(b.name));
+        contacts.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
         break;
       case ESortBy.nickname:
-        contacts.sort((a, b) => a.nickname.compareTo(b.nickname));
+        contacts.sort((a, b) => a.nickname.toLowerCase().compareTo(b.nickname.toLowerCase()));
         break;
       default:
         contacts.sort((a, b) => a.createdDateTime.compareTo(b.createdDateTime));
