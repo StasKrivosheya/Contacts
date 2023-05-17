@@ -1,6 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:contacts/src/models/contact_model.dart';
-import 'package:contacts/src/services/AppSettings/i_app_settings.dart';
+import 'package:contacts/src/services/app_settings/i_app_settings.dart';
 import 'package:contacts/src/services/authentication/i_authentication_service.dart';
 import 'package:contacts/src/services/repository/contact_repository.dart';
 import 'package:contacts/src/widgets/settings_page/bloc/settings_page_bloc.dart';

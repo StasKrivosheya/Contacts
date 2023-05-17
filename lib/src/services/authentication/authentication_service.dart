@@ -1,4 +1,4 @@
-import 'package:contacts/src/services/AppSettings/i_app_settings.dart';
+import 'package:contacts/src/services/app_settings/i_app_settings.dart';
 
 import 'i_authentication_service.dart';
 
