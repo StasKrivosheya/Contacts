@@ -12,3 +12,12 @@ class SortByValueChanged extends SettingsPageEvent {
   @override
   List<Object?> get props => [sortBy];
 }
+
+class ThemePreferenceChanged extends SettingsPageEvent {
+  final bool isDarkThemeEnabled;
+
+  const ThemePreferenceChanged({required this.isDarkThemeEnabled});
+
+  @override
+  List<Object?> get props => [isDarkThemeEnabled];
+}

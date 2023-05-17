@@ -1,5 +1,7 @@
 import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
-import 'package:contacts/src/services/AppSettings/i_app_settings.dart';
+import 'package:contacts/src/services/app_settings/i_app_settings.dart';
+import 'package:contacts/src/theme/app_themes.dart';
+import 'package:contacts/src/theme/bloc/theme_bloc.dart';
 import 'package:contacts/src/widgets/settings_page/bloc/settings_page_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -52,8 +54,13 @@ class _SettingsLayout extends StatelessWidget {
                   initialValue: state.isDarkThemeEnabled,
                   leading: const Icon(Icons.format_paint),
                   title: const Text('Enable dark theme'),
-                  // todo: show action sheet with options and fire corresponding event
-                  onToggle: (value) {},
+                  onToggle: (value) {
+                    context.read<SettingsPageBloc>()
+                        .add(ThemePreferenceChanged(isDarkThemeEnabled: value));
+
+                    final wantedTheme = value ? AppTheme.dark : AppTheme.light;
+                    context.read<ThemeBloc>().add(ThemeChanged(theme: wantedTheme));
+                  },
                 ),
               ],
             ),

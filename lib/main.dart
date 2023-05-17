@@ -2,12 +2,13 @@ import 'package:contacts/src/pages/add_edit_contact_page.dart';
 import 'package:contacts/src/pages/authentication/sign_in_page.dart';
 import 'package:contacts/src/pages/main_list_page.dart';
 import 'package:contacts/src/pages/settings_page.dart';
-import 'package:contacts/src/services/AppSettings/app_settings.dart';
-import 'package:contacts/src/services/AppSettings/i_app_settings.dart';
+import 'package:contacts/src/services/app_settings/app_settings.dart';
+import 'package:contacts/src/services/app_settings/i_app_settings.dart';
 import 'package:contacts/src/services/authentication/authentication_service.dart';
 import 'package:contacts/src/services/authentication/i_authentication_service.dart';
 import 'package:contacts/src/services/repository/contact_repository.dart';
 import 'package:contacts/src/services/repository/user_repository.dart';
+import 'package:contacts/src/theme/bloc/theme_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -42,23 +43,34 @@ class MyApp extends StatelessWidget {
         RepositoryProvider(create: (context) => ContactRepository()),
         RepositoryProvider(create: (context) => MediaPicker()),
       ],
-      child: BlocProvider(
-        create: (context) => MainListBloc(
-          contactRepository: context.read<ContactRepository>(),
-          authenticationService: context.read<IAuthenticationService>(),
-          appSettings: context.read<IAppSettings>(),
-        ),
-        child: MaterialApp(
-          title: 'Contacts',
-          theme: ThemeData(
-            primarySwatch: Colors.blue,
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) =>
+                MainListBloc(
+                  contactRepository: context.read<ContactRepository>(),
+                  authenticationService: context.read<IAuthenticationService>(),
+                  appSettings: context.read<IAppSettings>(),
+                ),
           ),
-          initialRoute: isLoggedIn ? '/mainList' : '/signIn',
-          routes: {
-            '/signIn': (context) => const SignInPage(),
-            '/mainList': (context) => const MainListPage(),
-            '/addEditContact': (context) => const AddEditContactPage(),
-            '/settings': (context) => const SettingsPage(),
+          BlocProvider(
+            create: (context) =>
+                ThemeBloc(appSettings: context.read<IAppSettings>()),
+          ),
+        ],
+        child: BlocBuilder<ThemeBloc, ThemeState>(
+          builder: (context, state) {
+            return MaterialApp(
+              title: 'Contacts',
+              theme: state.themeData,
+              initialRoute: isLoggedIn ? '/mainList' : '/signIn',
+              routes: {
+                '/signIn': (context) => const SignInPage(),
+                '/mainList': (context) => const MainListPage(),
+                '/addEditContact': (context) => const AddEditContactPage(),
+                '/settings': (context) => const SettingsPage(),
+              },
+            );
           },
         ),
       ),
