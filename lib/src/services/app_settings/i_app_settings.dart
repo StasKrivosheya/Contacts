@@ -1,3 +1,4 @@
+import 'package:contacts/src/theme/app_themes.dart';
 import 'package:contacts/src/widgets/settings_page/bloc/settings_page_bloc.dart';
 
 abstract class IAppSettings {
@@ -10,4 +11,7 @@ abstract class IAppSettings {
   Future<bool> setSortField(ESortBy sortField);
   ESortBy getSortField();
   Stream<ESortBy> getSortFieldStream();
+
+  Future<bool> setAppTheme(AppTheme appTheme);
+  AppTheme getAppTheme();
 }
