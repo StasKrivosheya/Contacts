@@ -1,4 +1,6 @@
 import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
+import 'package:contacts/src/languages/bloc/language_bloc.dart';
+import 'package:contacts/src/languages/language.dart';
 import 'package:contacts/src/services/app_settings/i_app_settings.dart';
 import 'package:contacts/src/theme/app_themes.dart';
 import 'package:contacts/src/theme/bloc/theme_bloc.dart';
@@ -47,19 +49,22 @@ class _SettingsLayout extends StatelessWidget {
                 SettingsTile.navigation(
                   leading: const Icon(Icons.language),
                   title: const Text('Language'),
-                  value: Text(state.selectedLanguage.name),
-                  // todo: show action sheet with options and fire corresponding event
+                  value: Text(state.selectedLanguage.displayableName),
+                  onPressed: _showLanguagesSheet,
                 ),
                 SettingsTile.switchTile(
                   initialValue: state.isDarkThemeEnabled,
                   leading: const Icon(Icons.format_paint),
                   title: const Text('Enable dark theme'),
-                  onToggle: (value) {
-                    context.read<SettingsPageBloc>()
-                        .add(ThemePreferenceChanged(isDarkThemeEnabled: value));
+                  onToggle: (isDarkThemeSwitched) {
+                    context.read<SettingsPageBloc>().add(ThemePreferenceChanged(
+                        isDarkThemeEnabled: isDarkThemeSwitched));
 
-                    final wantedTheme = value ? AppTheme.dark : AppTheme.light;
-                    context.read<ThemeBloc>().add(ThemeChanged(theme: wantedTheme));
+                    final wantedTheme =
+                        isDarkThemeSwitched ? AppTheme.dark : AppTheme.light;
+                    context
+                        .read<ThemeBloc>()
+                        .add(ThemeChanged(theme: wantedTheme));
                   },
                 ),
               ],
@@ -83,7 +88,9 @@ class _SettingsLayout extends StatelessWidget {
             ],
           ),
           onPressed: (context) {
-            blocContext.read<SettingsPageBloc>().add(const SortByValueChanged(ESortBy.date));
+            blocContext
+                .read<SettingsPageBloc>()
+                .add(const SortByValueChanged(ESortBy.date));
             Navigator.pop(context);
           }),
       BottomSheetAction(
@@ -96,7 +103,9 @@ class _SettingsLayout extends StatelessWidget {
             ],
           ),
           onPressed: (context) {
-            blocContext.read<SettingsPageBloc>().add(const SortByValueChanged(ESortBy.name));
+            blocContext
+                .read<SettingsPageBloc>()
+                .add(const SortByValueChanged(ESortBy.name));
             Navigator.pop(context);
           }),
       BottomSheetAction(
@@ -109,7 +118,34 @@ class _SettingsLayout extends StatelessWidget {
             ],
           ),
           onPressed: (context) {
-            blocContext.read<SettingsPageBloc>().add(const SortByValueChanged(ESortBy.nickname));
+            blocContext
+                .read<SettingsPageBloc>()
+                .add(const SortByValueChanged(ESortBy.nickname));
+            Navigator.pop(context);
+          }),
+    ]);
+  }
+
+  void _showLanguagesSheet(BuildContext context) {
+    final pageBlocContext = context;
+
+    showAdaptiveActionSheet(context: context, actions: [
+      BottomSheetAction(
+          title: Text(ELanguage.english.displayableName),
+          onPressed: (context) {
+            context.read<LanguageBloc>().add(
+                const LanguageChanged(selectedLanguage: ELanguage.english));
+            pageBlocContext.read<SettingsPageBloc>().add(const LanguageSettingsChanged(
+                selectedLanguage: ELanguage.english));
+            Navigator.pop(context);
+          }),
+      BottomSheetAction(
+          title: Text(ELanguage.ukrainian.displayableName),
+          onPressed: (context) {
+            context.read<LanguageBloc>().add(
+                const LanguageChanged(selectedLanguage: ELanguage.ukrainian));
+            pageBlocContext.read<SettingsPageBloc>().add(const LanguageSettingsChanged(
+                selectedLanguage: ELanguage.ukrainian));
             Navigator.pop(context);
           }),
     ]);

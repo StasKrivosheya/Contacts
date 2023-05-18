@@ -21,3 +21,12 @@ class ThemePreferenceChanged extends SettingsPageEvent {
   @override
   List<Object?> get props => [isDarkThemeEnabled];
 }
+
+class LanguageSettingsChanged extends SettingsPageEvent {
+  const LanguageSettingsChanged({required this.selectedLanguage});
+
+  final ELanguage selectedLanguage;
+
+  @override
+  List<Object?> get props => [selectedLanguage];
+}

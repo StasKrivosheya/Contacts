@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:contacts/src/languages/language.dart';
 import 'package:contacts/src/services/app_settings/i_app_settings.dart';
 import 'package:contacts/src/theme/app_themes.dart';
 import 'package:equatable/equatable.dart';
@@ -15,9 +16,11 @@ class SettingsPageBloc extends Bloc<SettingsPageEvent, SettingsPageState> {
         super(SettingsPageState(
           sortBy: appSettings.getSortField(),
           isDarkThemeEnabled: appSettings.getAppTheme() == AppTheme.dark,
+          selectedLanguage: appSettings.getLanguage(),
         )) {
     on<SortByValueChanged>(_onSortByValueChanged);
     on<ThemePreferenceChanged>(_onThemePreferenceChanged);
+    on<LanguageSettingsChanged>(_onLanguageSettingsChanged);
   }
 
   final IAppSettings _appSettings;
@@ -33,5 +36,11 @@ class SettingsPageBloc extends Bloc<SettingsPageEvent, SettingsPageState> {
     _appSettings.setAppTheme(
         event.isDarkThemeEnabled ? AppTheme.dark : AppTheme.light);
     emit(state.copyWith(isDarkThemeEnabled: event.isDarkThemeEnabled));
+  }
+
+  void _onLanguageSettingsChanged(
+      LanguageSettingsChanged event, Emitter<SettingsPageState> emit) async {
+    await _appSettings.setLanguage(event.selectedLanguage);
+    emit(state.copyWith(selectedLanguage: event.selectedLanguage));
   }
 }

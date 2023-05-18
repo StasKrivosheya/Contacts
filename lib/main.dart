@@ -1,3 +1,4 @@
+import 'package:contacts/src/languages/bloc/language_bloc.dart';
 import 'package:contacts/src/pages/add_edit_contact_page.dart';
 import 'package:contacts/src/pages/authentication/sign_in_page.dart';
 import 'package:contacts/src/pages/main_list_page.dart';
@@ -11,6 +12,7 @@ import 'package:contacts/src/services/repository/user_repository.dart';
 import 'package:contacts/src/theme/bloc/theme_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'src/services/media_picker/media_picker.dart';
 import 'src/widgets/authentication/main_list/bloc/main_list_bloc.dart';
@@ -57,18 +59,29 @@ class MyApp extends StatelessWidget {
             create: (context) =>
                 ThemeBloc(appSettings: context.read<IAppSettings>()),
           ),
+          BlocProvider(
+              create: (context) =>
+                  LanguageBloc(appSettings: context.read<IAppSettings>())),
         ],
-        child: BlocBuilder<ThemeBloc, ThemeState>(
-          builder: (context, state) {
-            return MaterialApp(
-              title: 'Contacts',
-              theme: state.themeData,
-              initialRoute: isLoggedIn ? '/mainList' : '/signIn',
-              routes: {
-                '/signIn': (context) => const SignInPage(),
-                '/mainList': (context) => const MainListPage(),
-                '/addEditContact': (context) => const AddEditContactPage(),
-                '/settings': (context) => const SettingsPage(),
+        child: BlocBuilder<LanguageBloc, LanguageState>(
+          builder: (context, languageState) {
+            return BlocBuilder<ThemeBloc, ThemeState>(
+              builder: (context, themeState) {
+                return MaterialApp(
+                  title: "Contacts",
+                  theme: themeState.themeData,
+                  locale: languageState.selectedLanguage.value,
+                  supportedLocales: AppLocalizations.supportedLocales,
+                  localizationsDelegates: AppLocalizations
+                      .localizationsDelegates,
+                  initialRoute: isLoggedIn ? '/mainList' : '/signIn',
+                  routes: {
+                    '/signIn': (context) => const SignInPage(),
+                    '/mainList': (context) => const MainListPage(),
+                    '/addEditContact': (context) => const AddEditContactPage(),
+                    '/settings': (context) => const SettingsPage(),
+                  },
+                );
               },
             );
           },

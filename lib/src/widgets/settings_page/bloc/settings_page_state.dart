@@ -2,23 +2,21 @@ part of 'settings_page_bloc.dart';
 
 enum ESortBy { name, nickname, date }
 
-enum ESupportedLanguages { english, ukrainian }
-
 class SettingsPageState extends Equatable {
   const SettingsPageState({
     this.sortBy = ESortBy.date,
     this.isDarkThemeEnabled = false,
-    this.selectedLanguage = ESupportedLanguages.english,
+    this.selectedLanguage = ELanguage.english,
   });
 
   final ESortBy sortBy;
   final bool isDarkThemeEnabled;
-  final ESupportedLanguages selectedLanguage;
+  final ELanguage selectedLanguage;
 
   SettingsPageState copyWith({
     ESortBy? sortBy,
     bool? isDarkThemeEnabled,
-    ESupportedLanguages? selectedLanguage,
+    ELanguage? selectedLanguage,
   }) {
     return SettingsPageState(
       sortBy: sortBy ?? this.sortBy,
