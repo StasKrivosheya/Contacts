@@ -1,0 +1,9 @@
+{
+  "usersSignIn": "Users SignIn",
+  "login": "Login",
+  "password": "Password",
+  "signIn": "Sign in",
+  "signUp": "Sign up",
+  "loginError": "Login error!",
+  "ok": "Ok"
+}
