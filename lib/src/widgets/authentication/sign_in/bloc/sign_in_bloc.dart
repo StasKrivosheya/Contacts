@@ -1,9 +1,11 @@
 import 'package:bloc/bloc.dart';
 import 'package:contacts/src/models/user_model.dart';
+import 'package:contacts/src/services/app_settings/i_app_settings.dart';
 import 'package:contacts/src/services/authentication/i_authentication_service.dart';
 import 'package:contacts/src/services/repository/user_repository.dart';
 import 'package:contacts/src/widgets/authentication/auth_status.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 part 'sign_in_event.dart';
 
@@ -12,9 +14,11 @@ part 'sign_in_state.dart';
 class SignInBloc extends Bloc<SignInEvent, SignInState> {
   SignInBloc(
       {required UserRepository userRepository,
-      required IAuthenticationService authenticationService})
+      required IAuthenticationService authenticationService,
+      required IAppSettings appSettings})
       : _userRepository = userRepository,
         _authenticationService = authenticationService,
+        _appSettings = appSettings,
         super(const SignInState()) {
     on<SignInUsernameChanged>(_onSignInUsernameChanged);
     on<SignInPasswordChanged>(_onSignInPasswordChanged);
@@ -23,6 +27,7 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
 
   final UserRepository _userRepository;
   final IAuthenticationService _authenticationService;
+  final IAppSettings _appSettings;
 
   void _onSignInUsernameChanged(SignInUsernameChanged event, Emitter<SignInState> emit) {
     emit(state.copyWith(username: event.username, status: AuthStatus.normal));
@@ -44,10 +49,12 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
     User? user = await _userRepository.getItemAsync(
         predicate: (user) => user.login == state.username);
 
+    final currentLocale = _appSettings.getLanguage().value;
+    final appLocalizations = await AppLocalizations.delegate.load(currentLocale);
+
     if (user == null) {
       String errorMessage =
-          'There\'s no user with such login in our database.\n'
-          'Double check it or consider registering.';
+          appLocalizations.theresNoUserWithSuchLoginInOurDatabaseDoubleCheck;
 
       emit(state.copyWith(
           status: AuthStatus.error,
@@ -56,7 +63,7 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
 
     } else if (user.password != state.password) {
       String errorMessage =
-          'Wrong password for ${state.username}. Try once more!';
+          '${appLocalizations.wrongPasswordFor} ${state.username}. ${appLocalizations.tryOnceMore}';
 
       emit(state.copyWith(
           status: AuthStatus.error,
@@ -71,7 +78,7 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
       } else {
         emit(state.copyWith(
           status: AuthStatus.error,
-          errorMessages: ['Error while saving to Shared Preferences!'],
+          errorMessages: [appLocalizations.errorWhileSavingToSharedPreferences],
         ));
       }
 

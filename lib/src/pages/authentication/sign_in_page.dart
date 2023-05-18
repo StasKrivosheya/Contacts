@@ -1,16 +1,16 @@
 import 'package:contacts/src/pages/authentication/sign_up_page.dart';
 import 'package:contacts/src/pages/main_list_page.dart';
+import 'package:contacts/src/services/app_settings/i_app_settings.dart';
 import 'package:contacts/src/services/authentication/i_authentication_service.dart';
 import 'package:contacts/src/services/repository/user_repository.dart';
 import 'package:contacts/src/widgets/authentication/auth_status.dart';
 import 'package:contacts/src/widgets/authentication/sign_in/bloc/sign_in_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SignInPage extends StatelessWidget {
   const SignInPage({Key? key}) : super(key: key);
-
-  final String title = 'Users SignIn';
 
   @override
   Widget build(BuildContext context) {
@@ -18,13 +18,14 @@ class SignInPage extends StatelessWidget {
       appBar: AppBar(
         title: Align(
           alignment: Alignment.topLeft,
-          child: Text(title),
+          child: Text(AppLocalizations.of(context)!.usersSignIn),
         ),
       ),
       body: BlocProvider<SignInBloc>(
         create: (context) => SignInBloc(
           userRepository: context.read<UserRepository>(),
           authenticationService: context.read<IAuthenticationService>(),
+          appSettings: context.read<IAppSettings>(),
         ),
         child: const _SignInLayout(),
       ),
@@ -52,14 +53,14 @@ class _SignInLayout extends StatelessWidget {
                 context: context,
                 builder: (context) {
                   return AlertDialog(
-                    title: const Text('Login error!'),
+                    title: Text(AppLocalizations.of(context)!.loginError),
                     content: Text(state.errorMessages.join('/n')),
                     actions: [
                       TextButton(
                           onPressed: () {
                             Navigator.of(context).pop();
                           },
-                          child: const Text('Ok')),
+                          child: Text(AppLocalizations.of(context)!.ok)),
                     ],
                   );
                 });
@@ -128,7 +129,7 @@ class _LoginInput extends StatelessWidget {
             onChanged: (username) =>
                 context.read<SignInBloc>().add(SignInUsernameChanged(username)),
             controller: _loginController,
-            decoration: const InputDecoration(hintText: "Login"),
+            decoration: InputDecoration(hintText: AppLocalizations.of(context)!.login),
           );
         });
   }
@@ -143,15 +144,16 @@ class _PasswordInput extends StatelessWidget {
         buildWhen: (previous, current) => previous.password != current.password,
         builder: (context, state) {
           _passwordController.value = TextEditingValue(
-              text: state.password,
-              selection: TextSelection.fromPosition(
-                  TextPosition(offset: state.password.length)));
+            text: state.password,
+            selection: TextSelection.fromPosition(
+                TextPosition(offset: state.password.length)),
+          );
           return TextField(
             onChanged: (password) =>
                 context.read<SignInBloc>().add(SignInPasswordChanged(password)),
             controller: _passwordController,
             obscureText: true,
-            decoration: const InputDecoration(hintText: "Password"),
+            decoration: InputDecoration(hintText: AppLocalizations.of(context)!.password),
           );
         });
   }
@@ -181,9 +183,9 @@ class _SignInButton extends StatelessWidget {
                     context.read<SignInBloc>().add(SignInSubmitted());
                   }
                 : null,
-            child: const Text(
-              "SIGN IN",
-              style: TextStyle(color: Colors.black),
+            child: Text(
+              AppLocalizations.of(context)!.signIn.toUpperCase(),
+              style: const TextStyle(color: Colors.black, ),
             ),
           ),
         );
@@ -197,10 +199,10 @@ class _SignUpHyperLink extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => _signUpTapped(context),
-      child: const Text(
-        "SIGN UP",
-        style: TextStyle(
-          color: Color.fromRGBO(26, 25, 255, 1),
+      child: Text(
+        AppLocalizations.of(context)!.signUp.toUpperCase(),
+        style: const TextStyle(
+          color: Colors.blue,
           fontWeight: FontWeight.bold,
           decoration: TextDecoration.underline,
         ),

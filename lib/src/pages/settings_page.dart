@@ -7,18 +7,17 @@ import 'package:contacts/src/theme/bloc/theme_bloc.dart';
 import 'package:contacts/src/widgets/settings_page/bloc/settings_page_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:settings_ui/settings_ui.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 
-  final String title = 'Settings';
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
+        title: Text(AppLocalizations.of(context)!.settings),
       ),
       body: BlocProvider<SettingsPageBloc>(
         create: (context) => SettingsPageBloc(
@@ -38,24 +37,30 @@ class _SettingsLayout extends StatelessWidget {
         return SettingsList(
           sections: [
             SettingsSection(
-              title: const Text('Common'),
+              title: Text(AppLocalizations.of(context)!.common),
               tiles: <SettingsTile>[
                 SettingsTile.navigation(
                   leading: const Icon(Icons.sort_by_alpha),
-                  title: const Text('Sort By'),
-                  value: Text(state.sortBy.name),
+                  title: Text(AppLocalizations.of(context)!.sortBy),
+                  value: Text(
+                    state.sortBy == ESortBy.date
+                        ? AppLocalizations.of(context)!.date.toLowerCase()
+                        : state.sortBy == ESortBy.name
+                            ? AppLocalizations.of(context)!.name.toLowerCase()
+                            : AppLocalizations.of(context)!.nickname.toLowerCase(),
+                  ),
                   onPressed: _onSortByPressed,
                 ),
                 SettingsTile.navigation(
                   leading: const Icon(Icons.language),
-                  title: const Text('Language'),
+                  title: Text(AppLocalizations.of(context)!.language),
                   value: Text(state.selectedLanguage.displayableName),
                   onPressed: _showLanguagesSheet,
                 ),
                 SettingsTile.switchTile(
                   initialValue: state.isDarkThemeEnabled,
                   leading: const Icon(Icons.format_paint),
-                  title: const Text('Enable dark theme'),
+                  title: Text(AppLocalizations.of(context)!.darkTheme),
                   onToggle: (isDarkThemeSwitched) {
                     context.read<SettingsPageBloc>().add(ThemePreferenceChanged(
                         isDarkThemeEnabled: isDarkThemeSwitched));
@@ -81,10 +86,10 @@ class _SettingsLayout extends StatelessWidget {
       BottomSheetAction(
           title: Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              Icon(Icons.date_range),
-              SizedBox(width: 10),
-              Text('Date'),
+            children: [
+              const Icon(Icons.date_range),
+              const SizedBox(width: 10),
+              Text(AppLocalizations.of(context)!.date),
             ],
           ),
           onPressed: (context) {
@@ -96,10 +101,10 @@ class _SettingsLayout extends StatelessWidget {
       BottomSheetAction(
           title: Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              Icon(Icons.text_fields),
-              SizedBox(width: 10),
-              Text('Name'),
+            children: [
+              const Icon(Icons.text_fields),
+              const SizedBox(width: 10),
+              Text(AppLocalizations.of(context)!.name),
             ],
           ),
           onPressed: (context) {
@@ -111,10 +116,10 @@ class _SettingsLayout extends StatelessWidget {
       BottomSheetAction(
           title: Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              Icon(Icons.text_fields),
-              SizedBox(width: 10),
-              Text('Nickname'),
+            children: [
+              const Icon(Icons.text_fields),
+              const SizedBox(width: 10),
+              Text(AppLocalizations.of(context)!.nickname),
             ],
           ),
           onPressed: (context) {

@@ -1,18 +1,23 @@
 import 'package:bloc/bloc.dart';
 import 'package:contacts/src/models/user_model.dart';
+import 'package:contacts/src/services/app_settings/i_app_settings.dart';
 import 'package:contacts/src/services/repository/user_repository.dart';
 import 'package:contacts/src/validators/string_validator.dart';
 import 'package:contacts/src/widgets/authentication/auth_status.dart';
 import 'package:equatable/equatable.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 part 'sign_up_event.dart';
 
 part 'sign_up_state.dart';
 
 class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
-  SignUpBloc(UserRepository userRepository)
+  SignUpBloc(
+      {required UserRepository userRepository,
+      required IAppSettings appSettings})
       : _userRepository = userRepository,
+        _appSettings = appSettings,
         super(const SignUpState()) {
     on<SignUpUsernameChanged>(_onSignUpUsernameChanged);
     on<SignUpPasswordChanged>(_onSignUpPasswordChanged);
@@ -21,6 +26,7 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
   }
 
   final UserRepository _userRepository;
+  final IAppSettings _appSettings;
 
   void _onSignUpUsernameChanged(
       SignUpUsernameChanged event, Emitter<SignUpState> emit) {
@@ -46,11 +52,14 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
 
   void _onSignUpConfirmed(
       SignUpConfirmed event, Emitter<SignUpState> emit) async {
+    final currentLocale = _appSettings.getLanguage().value;
+    final appLocalizations = await AppLocalizations.delegate.load(currentLocale);
+
     if (state.password == state.confirmPassword) {
       List<String> usernameErrors =
-          StringValidator.validateLogin(state.username);
+          StringValidator.validateLogin(state.username, appLocalizations);
       List<String> passwordErrors =
-          StringValidator.validatePassword(state.password);
+          StringValidator.validatePassword(state.password, appLocalizations);
 
       List<String> allErrors = usernameErrors + passwordErrors;
 
@@ -67,7 +76,7 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
           emit(state.copyWith(status: AuthStatus.success));
         } on DatabaseException {
           final String errorMessage =
-              'Username ${state.username} already exists, please consider another one.';
+              '${appLocalizations.username} ${state.username} ${appLocalizations.alreadyExistsPleaseConsiderAnother}';
 
           emit(state.copyWith(
             status: AuthStatus.error,
@@ -77,7 +86,7 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
         }
       }
     } else {
-      const String errorMessage = 'Passwords are different!';
+      final String errorMessage = appLocalizations.passwordsAreDifferent;
       emit(state.copyWith(
         status: AuthStatus.error,
         errorMessages: [errorMessage],

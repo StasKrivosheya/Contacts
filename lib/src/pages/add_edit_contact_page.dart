@@ -8,6 +8,7 @@ import 'package:contacts/src/services/repository/contact_repository.dart';
 import 'package:contacts/src/widgets/authentication/add_edit_contact/add_edit_contact_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AddEditContactPage extends StatelessWidget {
   const AddEditContactPage({super.key, this.contactModel});
@@ -30,15 +31,13 @@ class AddEditContactPage extends StatelessWidget {
 }
 
 class _PageScaffold extends StatelessWidget {
-  final String title = 'Add/Edit contact';
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Row(
           children: [
-            Text(title),
+            Text(AppLocalizations.of(context)!.addEditContact),
             const Spacer(),
             BlocConsumer<AddEditContactBloc, AddEditContactState>(
               listenWhen: (_, current) =>
@@ -94,10 +93,10 @@ class _PageBody extends StatelessWidget {
                       BottomSheetAction(
                           title: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
-                            children: const [
-                              Icon(Icons.photo_library_outlined),
-                              SizedBox(width: 10),
-                              Text('Gallery'),
+                            children: [
+                              const Icon(Icons.photo_library_outlined),
+                              const SizedBox(width: 10),
+                              Text(AppLocalizations.of(context)!.gallery),
                             ],
                           ),
                           onPressed: (context) {
@@ -109,10 +108,10 @@ class _PageBody extends StatelessWidget {
                       BottomSheetAction(
                           title: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
-                            children: const [
-                              Icon(Icons.camera_alt_outlined),
-                              SizedBox(width: 10),
-                              Text('Camera'),
+                            children: [
+                              const Icon(Icons.camera_alt_outlined),
+                              const SizedBox(width: 10),
+                              Text(AppLocalizations.of(context)!.camera),
                             ],
                           ),
                           onPressed: (context) {
@@ -180,7 +179,7 @@ class _NicknameInput extends StatelessWidget {
                 .add(ContactNicknameChanged(input));
           },
           controller: _nicknameController,
-          decoration: const InputDecoration(hintText: 'Nickname'),
+          decoration: InputDecoration(hintText: AppLocalizations.of(context)!.nickname),
         );
       },
     );
@@ -204,7 +203,7 @@ class _NameInput extends StatelessWidget {
             context.read<AddEditContactBloc>().add(ContactNameChanged(input));
           },
           controller: _nameController,
-          decoration: const InputDecoration(hintText: 'Name'),
+          decoration: InputDecoration(hintText: AppLocalizations.of(context)!.name),
         );
       },
     );
@@ -230,8 +229,8 @@ class _DescriptionInput extends StatelessWidget {
                 .add(ContactDescriptionChanged(input));
           },
           controller: _descriptionController,
-          decoration: const InputDecoration(
-            hintText: 'Description',
+          decoration: InputDecoration(
+            hintText: AppLocalizations.of(context)!.description,
             filled: true,
           ),
           minLines: 5,
