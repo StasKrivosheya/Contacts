@@ -1,3 +1,4 @@
+import 'package:contacts/src/languages/language.dart';
 import 'package:contacts/src/services/app_settings/i_app_settings.dart';
 import 'package:contacts/src/theme/app_themes.dart';
 import 'package:contacts/src/widgets/settings_page/bloc/settings_page_bloc.dart';
@@ -8,6 +9,7 @@ class AppSettings implements IAppSettings {
   static const String _keyUserId = "userId";
   static const String _keySortField = "sortField";
   static const String _keyAppTheme = "appTheme";
+  static const String _keyLanguage = "language";
 
   late final SharedPreferences _sharedPreferences;
   final _sortFieldStreamController = BehaviorSubject<ESortBy>();
@@ -75,6 +77,26 @@ class AppSettings implements IAppSettings {
     }
 
     return themeToApply;
+  }
+
+  @override
+  Future<bool> setLanguage(ELanguage language) {
+    return _sharedPreferences!.setInt(_keyLanguage, language.index);
+  }
+
+  @override
+  ELanguage getLanguage() {
+    final preferredLanguageIndex = _sharedPreferences!.getInt(_keyLanguage);
+
+    ELanguage result;
+
+    if (preferredLanguageIndex != null) {
+      result = ELanguage.values[preferredLanguageIndex];
+    } else {
+      result = ELanguage.english;
+    }
+
+    return result;
   }
 
   void _initSortFieldStream() {
