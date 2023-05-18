@@ -1,13 +1,13 @@
+import 'package:contacts/src/services/app_settings/i_app_settings.dart';
 import 'package:contacts/src/services/repository/user_repository.dart';
 import 'package:contacts/src/widgets/authentication/auth_status.dart';
 import 'package:contacts/src/widgets/authentication/sign_up/bloc/sign_up_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SignUpPage extends StatelessWidget {
   const SignUpPage({Key? key}) : super(key: key);
-
-  final String title = 'Users SignUp';
 
   @override
   Widget build(BuildContext context) {
@@ -22,12 +22,14 @@ class SignUpPage extends StatelessWidget {
                 },
                 icon: const Icon(Icons.arrow_back)),
             const SizedBox(width: 15),
-            Text(title),
+            Text(AppLocalizations.of(context)!.usersSignUp),
           ],
         ),
       ),
       body: BlocProvider(
-        create: (context) => SignUpBloc(context.read<UserRepository>()),
+        create: (context) => SignUpBloc(
+            userRepository: context.read<UserRepository>(),
+            appSettings: context.read<IAppSettings>()),
         child: const _SignUpLayout(),
       ),
     );
@@ -50,14 +52,14 @@ class _SignUpLayout extends StatelessWidget {
               context: context,
               builder: (context) {
                 return AlertDialog(
-                  title: const Text('SignUp error!'),
+                  title: Text(AppLocalizations.of(context)!.signUpError),
                   content: Text(state.errorMessages.join('\n')),
                   actions: [
                     TextButton(
                         onPressed: () {
                           Navigator.of(context).pop();
                         },
-                        child: const Text('Ok')),
+                        child: Text(AppLocalizations.of(context)!.ok)),
                   ],
                 );
               });
@@ -105,7 +107,7 @@ class _LoginInput extends StatelessWidget {
       onChanged: (login) {
         context.read<SignUpBloc>().add(SignUpUsernameChanged(login));
       },
-      decoration: const InputDecoration(hintText: "Login"),
+      decoration: InputDecoration(hintText: AppLocalizations.of(context)!.login),
     );
   }
 }
@@ -118,7 +120,7 @@ class _PasswordInput extends StatelessWidget {
         context.read<SignUpBloc>().add(SignUpPasswordChanged(password));
       },
       obscureText: true,
-      decoration: const InputDecoration(hintText: "Password"),
+      decoration: InputDecoration(hintText: AppLocalizations.of(context)!.password),
     );
   }
 }
@@ -133,7 +135,7 @@ class _ConfirmPasswordInput extends StatelessWidget {
             .add(SignUpConfirmPasswordChanged(confirmPassword));
       },
       obscureText: true,
-      decoration: const InputDecoration(hintText: "Confirm Password"),
+      decoration: InputDecoration(hintText: AppLocalizations.of(context)!.confirmPassword),
     );
   }
 }
@@ -164,9 +166,9 @@ class _SignUpButton extends StatelessWidget {
                     context.read<SignUpBloc>().add(SignUpConfirmed());
                   }
                 : null,
-            child: const Text(
-              "SIGN UP",
-              style: TextStyle(color: Colors.black),
+            child: Text(
+              AppLocalizations.of(context)!.signUp.toUpperCase(),
+              style: const TextStyle(color: Colors.black),
             ),
           ),
         );

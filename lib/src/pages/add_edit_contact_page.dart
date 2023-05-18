@@ -8,6 +8,7 @@ import 'package:contacts/src/services/repository/contact_repository.dart';
 import 'package:contacts/src/widgets/authentication/add_edit_contact/add_edit_contact_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AddEditContactPage extends StatelessWidget {
   const AddEditContactPage({super.key, this.contactModel});
@@ -30,15 +31,13 @@ class AddEditContactPage extends StatelessWidget {
 }
 
 class _PageScaffold extends StatelessWidget {
-  final String title = 'Add/Edit contact';
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Row(
           children: [
-            Text(title),
+            Text(AppLocalizations.of(context)!.addEditContact),
             const Spacer(),
             BlocConsumer<AddEditContactBloc, AddEditContactState>(
               listenWhen: (_, current) =>
@@ -88,16 +87,40 @@ class _PageBody extends StatelessWidget {
             child: GestureDetector(
               onTap: () {
                 final blocContext = context;
-                showAdaptiveActionSheet(context: context, actions: <BottomSheetAction>[
-                  BottomSheetAction(title: const Text('Gallery'), onPressed: (context) {
-                    blocContext.read<AddEditContactBloc>().add(const PickFromGalleryRequested());
-                    Navigator.pop(context);
-                  }),
-                  BottomSheetAction(title: const Text('Camera'), onPressed: (context) {
-                    blocContext.read<AddEditContactBloc>().add(const TakeWithCameraRequested());
-                    Navigator.pop(context);
-                  }),
-                ]);
+                showAdaptiveActionSheet(
+                    context: context,
+                    actions: <BottomSheetAction>[
+                      BottomSheetAction(
+                          title: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.photo_library_outlined),
+                              const SizedBox(width: 10),
+                              Text(AppLocalizations.of(context)!.gallery),
+                            ],
+                          ),
+                          onPressed: (context) {
+                            blocContext
+                                .read<AddEditContactBloc>()
+                                .add(const PickFromGalleryRequested());
+                            Navigator.pop(context);
+                          }),
+                      BottomSheetAction(
+                          title: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.camera_alt_outlined),
+                              const SizedBox(width: 10),
+                              Text(AppLocalizations.of(context)!.camera),
+                            ],
+                          ),
+                          onPressed: (context) {
+                            blocContext
+                                .read<AddEditContactBloc>()
+                                .add(const TakeWithCameraRequested());
+                            Navigator.pop(context);
+                          }),
+                    ]);
               },
               child: BlocBuilder<AddEditContactBloc, AddEditContactState>(
                 buildWhen: (prev, curr) =>
@@ -156,7 +179,7 @@ class _NicknameInput extends StatelessWidget {
                 .add(ContactNicknameChanged(input));
           },
           controller: _nicknameController,
-          decoration: const InputDecoration(hintText: 'Nickname'),
+          decoration: InputDecoration(hintText: AppLocalizations.of(context)!.nickname),
         );
       },
     );
@@ -180,7 +203,7 @@ class _NameInput extends StatelessWidget {
             context.read<AddEditContactBloc>().add(ContactNameChanged(input));
           },
           controller: _nameController,
-          decoration: const InputDecoration(hintText: 'Name'),
+          decoration: InputDecoration(hintText: AppLocalizations.of(context)!.name),
         );
       },
     );
@@ -206,12 +229,13 @@ class _DescriptionInput extends StatelessWidget {
                 .add(ContactDescriptionChanged(input));
           },
           controller: _descriptionController,
-          decoration: const InputDecoration(
-            hintText: 'Description',
+          decoration: InputDecoration(
+            hintText: AppLocalizations.of(context)!.description,
             filled: true,
           ),
           minLines: 5,
           maxLines: 5,
+          maxLength: 120,
         );
       },
     );

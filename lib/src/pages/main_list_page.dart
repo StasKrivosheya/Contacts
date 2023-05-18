@@ -5,25 +5,26 @@ import 'package:contacts/src/pages/add_edit_contact_page.dart';
 import 'package:contacts/src/widgets/authentication/main_list/bloc/main_list_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 
 import 'authentication/sign_in_page.dart';
+import 'settings_page.dart';
 
 class MainListPage extends StatelessWidget {
   const MainListPage({super.key});
 
-  final String title = 'Main List';
-
   @override
   Widget build(BuildContext context) {
     context.read<MainListBloc>().add(ContactsListSubscriptionRequested());
+    context.read<MainListBloc>().add(ContactsSortFieldSubscriptionRequested());
 
     return Scaffold(
       appBar: AppBar(
         title: Row(
           children: [
-            Text(title),
+            Text(AppLocalizations.of(context)!.mainList),
             const Spacer(),
             IconButton(
               icon: const Icon(Icons.logout),
@@ -34,13 +35,12 @@ class MainListPage extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.settings),
               onPressed: () {
-                // TODO: create settings page, add route and navigate
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(builder: (context) {
-                //     return const SettingsPage();
-                //   }),
-                // );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) {
+                    return const SettingsPage();
+                  }),
+                );
               },
             ),
           ],
@@ -58,14 +58,14 @@ class MainListPage extends StatelessWidget {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: const Text('Log out'),
-            content: const Text('Are you sure you want to log out?'),
+            title: Text(AppLocalizations.of(context)!.logOut),
+            content: Text(AppLocalizations.of(context)!.areYouSureYouWantLogOut),
             actions: [
               TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: const Text('Cancel')),
+                  child: Text(AppLocalizations.of(context)!.cancel)),
               TextButton(
                   onPressed: () {
                     context.read<MainListBloc>().add(SignOutRequested());
@@ -75,7 +75,7 @@ class MainListPage extends StatelessWidget {
                             const SignInPage()),
                             (Route<dynamic> route) => false);
                   },
-                  child: const Text('Confirm')),
+                  child: Text(AppLocalizations.of(context)!.confirm)),
             ],
           );
         });
@@ -123,10 +123,10 @@ class _MainListPageBody extends StatelessWidget {
             widgetToShow = const _ContactsListView();
             break;
           default:
-            widgetToShow = const Center(
+            widgetToShow = Center(
               child: Text(
-                'No contacts added yet...',
-                style: TextStyle(fontSize: 21),
+                AppLocalizations.of(context)!.noContactsAddedYet,
+                style: const TextStyle(fontSize: 21),
               ),
             );
             break;
@@ -172,6 +172,7 @@ class _ContactsListView extends StatelessWidget {
               child: Slidable(
                 startActionPane: ActionPane(
                   motion: const DrawerMotion(),
+                  extentRatio: 0.5,
                   children: [
                     SlidableAction(
                       onPressed: (context) {
@@ -180,13 +181,13 @@ class _ContactsListView extends StatelessWidget {
                       backgroundColor: const Color(0xFFFE4A49),
                       foregroundColor: Colors.white,
                       icon: Icons.delete,
-                      label: 'DELETE',
+                      label: AppLocalizations.of(context)!.delete.toUpperCase(),
                     ),
                   ],
                 ),
                 endActionPane: ActionPane(
                   motion: const DrawerMotion(),
-                  extentRatio: 0.3,
+                  extentRatio: 0.35,
                   children: [
                     SlidableAction(
                       onPressed: (context) {
@@ -201,7 +202,7 @@ class _ContactsListView extends StatelessWidget {
                       backgroundColor: const Color(0xFF21B7CA),
                       foregroundColor: Colors.white,
                       icon: Icons.edit_note,
-                      label: 'Edit',
+                      label: AppLocalizations.of(context)!.edit,
                     ),
                   ],
                 ),
@@ -283,22 +284,22 @@ class _ContactsListView extends StatelessWidget {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: const Text('DELETE CONTACT?'),
+            title: Text(AppLocalizations.of(context)!.deleteContact),
             content: Text(
-                'Are you sure you want to delete ${contact.nickname}?'),
+                '${AppLocalizations.of(context)!.areYouSureYouWantToDelete} ${contact.nickname}?'),
             actions: [
               TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: const Text('Cancel')),
+                  child: Text(AppLocalizations.of(context)!.cancel)),
               TextButton(
                   onPressed: () {
                     context.read<MainListBloc>().add(
                         DeleteContactRequested(contact));
                     Navigator.of(context).pop();
                   },
-                  child: const Text('Yes')),
+                  child: Text(AppLocalizations.of(context)!.yes)),
             ],
           );
         });

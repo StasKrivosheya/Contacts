@@ -1,29 +1,37 @@
+import 'package:contacts/src/languages/bloc/language_bloc.dart';
 import 'package:contacts/src/pages/add_edit_contact_page.dart';
 import 'package:contacts/src/pages/authentication/sign_in_page.dart';
-import 'package:contacts/src/helpers/app_settings.dart';
 import 'package:contacts/src/pages/main_list_page.dart';
+import 'package:contacts/src/pages/settings_page.dart';
+import 'package:contacts/src/services/app_settings/app_settings.dart';
+import 'package:contacts/src/services/app_settings/i_app_settings.dart';
 import 'package:contacts/src/services/authentication/authentication_service.dart';
 import 'package:contacts/src/services/authentication/i_authentication_service.dart';
-import 'package:contacts/src/services/media_picker/i_media_picker.dart';
 import 'package:contacts/src/services/repository/contact_repository.dart';
 import 'package:contacts/src/services/repository/user_repository.dart';
+import 'package:contacts/src/theme/bloc/theme_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'src/services/media_picker/media_picker.dart';
 import 'src/widgets/authentication/main_list/bloc/main_list_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await AppSettings.init();
+  IAppSettings appSettings = AppSettings();
+  await appSettings.init();
 
-  runApp(const MyApp());
+  runApp(MyApp(appSettings: appSettings));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key, required IAppSettings appSettings})
+      : _appSettings = appSettings,
+        _authenticationService = AuthenticationService(appSettings: appSettings);
 
-  final IAuthenticationService _authenticationService = const AuthenticationService();
+  final IAppSettings _appSettings;
+  final IAuthenticationService _authenticationService;
 
   @override
   Widget build(BuildContext context) {
@@ -31,26 +39,51 @@ class MyApp extends StatelessWidget {
 
     return MultiRepositoryProvider(
       providers: [
+        RepositoryProvider.value(value: _appSettings),
         RepositoryProvider.value(value: _authenticationService),
         RepositoryProvider(create: (context) => UserRepository()),
         RepositoryProvider(create: (context) => ContactRepository()),
         RepositoryProvider(create: (context) => MediaPicker()),
       ],
-      child: BlocProvider(
-        create: (context) => MainListBloc(
-          contactRepository: context.read<ContactRepository>(),
-          authenticationService: context.read<IAuthenticationService>(),
-        ),
-        child: MaterialApp(
-          title: 'Contacts',
-          theme: ThemeData(
-            primarySwatch: Colors.blue,
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) =>
+                MainListBloc(
+                  contactRepository: context.read<ContactRepository>(),
+                  authenticationService: context.read<IAuthenticationService>(),
+                  appSettings: context.read<IAppSettings>(),
+                ),
           ),
-          initialRoute: isLoggedIn ? '/mainList' : '/signIn',
-          routes: {
-            '/signIn': (context) => const SignInPage(),
-            '/mainList': (context) => const MainListPage(),
-            '/addEditContact': (context) => const AddEditContactPage(),
+          BlocProvider(
+            create: (context) =>
+                ThemeBloc(appSettings: context.read<IAppSettings>()),
+          ),
+          BlocProvider(
+              create: (context) =>
+                  LanguageBloc(appSettings: context.read<IAppSettings>())),
+        ],
+        child: BlocBuilder<LanguageBloc, LanguageState>(
+          builder: (context, languageState) {
+            return BlocBuilder<ThemeBloc, ThemeState>(
+              builder: (context, themeState) {
+                return MaterialApp(
+                  title: "Contacts",
+                  theme: themeState.themeData,
+                  locale: languageState.selectedLanguage.value,
+                  supportedLocales: AppLocalizations.supportedLocales,
+                  localizationsDelegates: AppLocalizations
+                      .localizationsDelegates,
+                  initialRoute: isLoggedIn ? '/mainList' : '/signIn',
+                  routes: {
+                    '/signIn': (context) => const SignInPage(),
+                    '/mainList': (context) => const MainListPage(),
+                    '/addEditContact': (context) => const AddEditContactPage(),
+                    '/settings': (context) => const SettingsPage(),
+                  },
+                );
+              },
+            );
           },
         ),
       ),
